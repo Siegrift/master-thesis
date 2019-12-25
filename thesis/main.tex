@@ -139,12 +139,13 @@ Supervisor: & \mfskolitel \\
 \newpage 
 \section*{Abstrakt}
 
-Slovenský abstrakt v rozsahu 100-500 slov, jeden odstavec. Abstrakt
-stručne sumarizuje výsledky práce. Mal by byť pochopiteľný pre bežného
-informatika. Nemal by teda využívať skratky, termíny alebo označenie
-zavedené v práci, okrem tých, ktoré sú všeobecne známe.
+DTW \textit{(z angl. dynamic time warping)} je jednoduchý algoritmus na zarovnávanie dvoch
+sekvencii, ktorý funguje v kvardatickom čase a je založený na dynamickom programovaní. Sekvencie sú
+častokrát dĺžky rádovo miliardy znakov a takýto algortmus pre ne nie je vhodný. V práci sa
+sútreďujeme na alternatívne riešenia, ktoré bežia v lepšej časovej zložitosti a miera ich chyby je
+minimálna. 
 
-\paragraph*{Kľúčové slová:} jedno, druhé, tretie (prípadne štvrté, piate)
+\paragraph*{Kľúčové slová: dynamic time warping, minION, zarovnávanie sekvencii}
 % --- Koniec Abstrakt - Slovensky
 
 
@@ -154,11 +155,13 @@ zavedené v práci, okrem tých, ktoré sú všeobecne známe.
 \newpage 
 \section*{Abstract}
 
-Abstract in the English language (translation of the abstract in the
-Slovak language).
+DTW \textit{(dynamic time warping)} is a simple dynamic programming algorithm for sequence alignment
+of two sequences, which has quadratic time complexity. However, sequences are often longer than
+billions of characters and this algorithm is not feasible for such sequences. In this work we focus
+of alternative solutions which have smaller time complexity and provide a solution possibly with a
+small error.
 
-
-\paragraph*{Keywords:} 
+\paragraph*{Keywords: dynamic time warping, minION, sequence alignment} 
 
 % --- Koniec Abstrakt - Anglicky
 
@@ -204,9 +207,9 @@ Slovak language).
 \mainmatter
 
 
-%\input uvod.tex 
+\input uvod.tex 
 
-%\input kapitola.tex
+\input dnaSequencing.tex
 
 %\input latex.tex
 

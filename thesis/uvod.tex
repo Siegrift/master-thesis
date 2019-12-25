@@ -2,24 +2,23 @@
 \addcontentsline{toc}{chapter}{Úvod} % rucne pridanie do obsahu
 \markboth{Úvod}{Úvod} % vyriesenie hlaviciek
 
-Cieľom tejto práce je poskytnúť študentom posledného ročníka
-bakalárskeho štúdia informatiky kostru práce v systéme LaTeX a ukážku
-užitočných príkazov, ktoré pri písaní práce môžu potrebovať. Začneme
-stručnou charakteristikou úvodu práce podľa smernice o záverečných
-prácach \cite{smernica}, ktorú uvádzame ako doslovný citát.
+DNA sequencing is a great challenge in modern bioinformatics. Ten years ago, it took a lot of time
+and millions of dollars to sequence the whole human genome. Modern technologies can nowdays do so
+faster and cheaper. These technologies are very precise, but the device is still very big and
+expensive. \cite{barbora_bakalarka}
 
-\begin{quote}
-Úvod je prvou komplexnou informáciou o práci, jej cieli, obsahu a štruktúre. Úvod sa 
-vzťahuje na spracovanú tému konkrétne, obsahuje stručný a výstižný opis 
-problematiky, charakterizuje stav poznania alebo praxe v oblasti, ktorá je predmetom 
-školského diela a oboznamuje s významom, cieľmi a zámermi školského diela. Autor 
-v úvode zdôrazňuje, prečo je práca dôležitá a prečo sa rozhodol spracovať danú tému. 
-Úvod ako názov kapitoly sa nečísluje a jeho rozsah je spravidla 1 až 2 strany.
-\end{quote}
+In 2012, scientists at Oxford Nanopore Technologies developed the new portable device
+called MinION that can sequence DNA and costs only several thousands. MinION has, however, several
+issues. The main problem is the precision of sequencing. This device measures an electric current
+flowing through nanopore with DNA molecule inside. The process of translating this data into DNA
+sequence is called basecalling and introduces a lot of errors due to disruptions in measured values.
 
-V nasledujúcej kapitole nájdete ukážku členenia kapitoly na menšie
-časti a v kapitole \ref{kap:latex} nájdete príkazy na prácu s
-tabuľkami, obrázkami a matematickými výrazmi. V kapitole
-\ref{kap:lorem} uvádzame klasický text Lorem Ipsum a na koniec sa
-budeme venovať záležitostiam záveru bakalárskej práce. 
+Another problem we face is the length of the scanned sequence which is often billions of characters
+long. Using simple algorithms like DTW or Needleman-Wunsch algorithm which have quadratic time
+complexity is not possible.
 
+However, the sequences are not just random strings and we can often have some assumptions about
+them, which can be used to design a faster algorithm. The algorithm is allowed not to produce an
+optimal solution when aligning the sequences. We tolerate a small error as a tradeoff between time
+complexity and precision. Also, if we are using sequences from MinION we already introduced some
+innacurracy.
