@@ -166,6 +166,12 @@ will not be found if it is not entirely inside the window. Using constraints spe
 constant factor, but the DTW algorithm is still $O(N^2)$ if the size of the input window is a
 function of the length of the input time series.
 
+Constraints work well in domains where the optimal warp path is expected to be close to a linear
+warp and passes through the cost matrix diagonally in a relatively straight line. Constraints work
+poorly if time series are of events that start and stop at radically different times because the
+warp path can stray very far from a linear warp and nearly the entire cost matrix must be evaluated
+to find the optimal warp path. \cite{toward_accurate__dtw}
+
 \subsection{Data Abstraction}
 
 Data abstraction speeds up the DTW algorithm by running DTW on a reduced representation of the data.
@@ -177,10 +183,14 @@ is still $O(N^2)$.
 
 \section{FastDTW}
 
-FastDTW, is an approximation of DTW that has a linear time and space complexity. FastDTW uses a
-multilevel approach that recursively projects a solution from a coarse resolution and refines the
-projected solution. It has proven linear time and space complexity. Accuracy analysis results show a
-large improvement in accuracy over the existing methods. \cite{toward_accurate__dtw}
+FastDTW algorithm uses ideas from both the constraints and data abstraction. By combining both of
+the DTW improvements it overcomes many limitations of using either method individually, and yields
+an algorithm that is linear in both time and space. 
+
+FastDTW uses a multilevel approach that
+recursively projects a solution from a coarse resolution and refines the projected solution. It has
+proven linear time and space complexity. Accuracy analysis results show a large improvement in
+accuracy over the existing methods. \cite{toward_accurate__dtw}
 
 The FastDTW algorithm uses a multilevel approach with three key operations:
 \begin{enumerate}
@@ -244,8 +254,8 @@ detailed results in the table below.
 There are many open source implementations of FastDTW algorithm in many different languages like
 Java, Python, C++.
 
-\section{Further improvements}
+\subsection{Disadvantages and further improvements}
 
-Further improvements of the algorithm can be made by choosing clever heuristics or by having
-additional information about the sequences. But generally, this algorithm (due to its scalability)
-is the most popular.
+The biggest disadvantage of FastDTW algorithm is that it doesn't guarantee an optimal alignment (but
+it often does). Further improvements of the algorithm can be by researching how to further increase
+the accuracy of the algorithm.
