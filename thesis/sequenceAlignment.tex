@@ -118,6 +118,135 @@ implementation of cost function, which needs to add additional penalty if there 
 You can find more about the gap penalty implementation and further improvements in
 \cite{Boes2014ImprovingTN}.
 
-\section{FastDTW algorithm}
+\subsection{BLOSUM}
 
-\section{Efficient DTW Algorithm}
+Needleman-Wunsch algorithm is often used to align protein sequences (note that protein sequences is
+a differs from DNA sequence). There are $20$ standard amino acids, and there are different
+probabilities that two amino acids can be matched together and various penalties if they differ.
+This led to an idea of constructing a $20 x 20$ matrix specifying score for each pair of the acids. 
+
+BLOSUM (\textbf{BLO}cks \textbf{SU}bstitution \textbf{M}atrix) is based on local alignments. BLOSUM
+matrices were first introduced in by Steven Henikoff and Jorja Henikoff. They scanned the BLOCKS
+database for very conserved regions of protein families (that do not have gaps in the sequence
+alignment) and then counted the relative frequencies of amino acids and their substitution
+probabilities.
+
+\section{DTW performance improvements}
+
+The problem of DTW is that it needs to fill the whole matrix, which is quadratic. We are often
+satisfied with near optimal solution as a tradeoff for performance. The methods used make DTW
+faster fall into three categories \cite{toward_accurate__dtw}:
+
+\begin{enumerate}
+  \item \textbf{Constraints} – Limit the number of cells that are
+  evaluated in the cost matrix.
+  \item  \textbf{Data Abstraction} – Perform DTW on a reduced
+  representation of the data.
+  \item  \textbf{Indexing} – Use lower bounding functions to reduce the number of times DTW must be
+  run during time series classification or clustering (we will not explain further this topic).
+\end{enumerate}
+
+\subsection{Constraints}
+
+Constraints are widely used to speed up DTW. Two of the most commonly used constraints are the
+Sakoe-Chuba Band and the Itakura Parallelogram.
+
+\begin{figure}[H]
+  \centerline{\includegraphics[width=0.7\textwidth]{images/constraints.png}}
+  \caption[Two constraints: Sakoe-Chuba Band (left) and an Itakura Parallelogram (right), both have
+  a width of 5.]{Two constraints: Sakoe-Chuba Band (left) and an Itakura Parallelogram (right), both
+  have a width of 5.}
+  \label{obr:constraints}
+\end{figure}
+
+The gray cells are the the ones filled by the DTW algorithm. However, the globally optimal warp path
+will not be found if it is not entirely inside the window. Using constraints speeds up DTW by a
+constant factor, but the DTW algorithm is still $O(N^2)$ if the size of the input window is a
+function of the length of the input time series.
+
+\subsection{Data Abstraction}
+
+Data abstraction speeds up the DTW algorithm by running DTW on a reduced representation of the data.
+Rather than running the DTW algorithm on the full resolution (1/1) cost matrix, the time series are
+reduced in size to make the number of cells in the cost matrix more manageable. A warp path is found
+for the lower-resolution time series and is mapped back to the full resolution cost matrix. This
+improvement also speeds up the algorithm by a large constant factor, but the running time coplexity
+is still $O(N^2)$.
+
+\section{FastDTW}
+
+DTW has a quadratic time and space complexity that limits its use to only small time series data
+sets. FastDTW, is an approximation of DTW that has a linear time and space complexity. FastDTW uses
+a multilevel approach that recursively projects a solution from a coarse resolution and refines the
+projected solution. It has proven linear time and space complexity both theoretically and
+empirically. Accuracy analysis results show a large improvement in accuracy over the existing
+methods. \cite{toward_accurate__dtw}
+
+The FastDTW algorithm uses a multilevel approach with three key operations:
+\begin{enumerate}
+  \item \textbf{Coarsening} – Shrink a time series into a smaller time series that represents the
+  same curve as accurately as possible with fewer data points.
+  \item \textbf{Projection} – Find a minimum-distance warp path at a lower resolution, and use that
+  warp path as an initial guess for a higher resolution’s minimum-distance warp path.
+  \item \textbf{Refinement} – Refine the warp path projected from a lower resolution through local
+  adjustments of the warp path.
+\end{enumerate}
+
+Coarsening reduces the size (or resolution) of a time series by averaging adjacent pairs of points.
+The resulting time series is a factor of two smaller than the original time series. Coarsening is
+run several times to produce many different resolutions of the time series. Projection takes a warp
+path calculated at a lower resolution and determines what cells in the next higher resolution time
+series the warp path passes through. Since the resolution is increasing by a factor of two, a single
+point in the low-resolution warp path will map to at least four points at the higher resolution.
+This projected path is then used as a heuristic during solution refinement to find a warp path at
+the higher resolution. Refinement finds the optimal warp path in the neighborhood of the projected
+path, where the size of the neighborhood is controlled by the radius parameter.
+\cite{toward_accurate__dtw}
+
+\begin{figure}[H]
+  \centerline{\includegraphics[width=0.9\textwidth]{images/fast_dtw.png}}
+  \caption[The four different resolutions evaluated during a complete run of the FastDTW
+  algorithm.]{The four different resolutions evaluated during a complete run of the FastDTW
+  algorithm.}
+  \label{obr:fast_dtw}
+\end{figure}
+
+\subsection{Analysis results}
+
+Here we briefly summarize the results of the analysis provided in the original paper
+\cite{toward_accurate__dtw}. The algorithm was tested on three different types of sequences and
+compared against two other existing approximate DTW algorithms: Sakoe-Chuba \textbf{bands} and
+\textbf{data abstraction}.
+
+The FastDTW algorithm is very accurate for all three groups of data that it was tested on. FastDTW
+has an error of only $19.2\%$ to $0.0\%$, depending on the value of the radius parameter. For all
+algorithms, the error decreases as the radius parameter increases. However, FastDTW converges to
+$0\%$ error much faster than the other two algorithms.
+
+\begin{figure}[H]
+  \centerline{\includegraphics[width=0.9\textwidth]{images/fast_dtw_analysis.png}}
+  \caption[Results of accuracy analysis]{Results of accuracy analysis}
+  \label{obr:fast_dtw_analysis}
+\end{figure}
+
+When we analyze the performance of FastDTW algorithm, the FastDTW algorithm is significantly faster
+than the standard DTW algorithm for all but the smallest time series. FastDTW is 50 to 150 times
+faster than standard DTW (with $~100$ radius and sequence length of $150000$). You can see a more
+detailed results in the table below.
+
+\begin{figure}[H]
+  \centerline{\includegraphics[width=0.9\textwidth]{images/dtw_performance.png}}
+  \caption[Results of performance analysis]{Results of performance analysis}
+  \label{obr:dtw_performance.png}
+\end{figure}
+
+\subsection{FastDTW implementations}
+
+There are many open source implementations of FastDTW algorithm in many different languages like
+Java, Python, C++.
+
+\section{Further improvements}
+
+Further improvements of the algorithm can be made by choosing clever heuristics or by having
+additional information about the sequences. But generally, this algorithm (due to its scalability)
+is the most popular.
