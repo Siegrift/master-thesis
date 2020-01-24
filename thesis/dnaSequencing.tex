@@ -15,7 +15,7 @@ evolving. One of the latest methods of sequencing is the nanoporous DNA sequenci
 
 Nanopore sequencing is a unique, scalable technology that enables direct, real-time analysis of long
 DNA or RNA fragments. It works by monitoring changes to an electrical current as nucleic acids are
-passed through a protein nanopore. The resulting signal is decoded to provide the specific DNA or
+passing through a protein nanopore. The resulting signal is decoded to provide the specific DNA or
 RNA sequence.
 
 MinION is a new real-time sequencing technology developed by Oxford Nanopore
@@ -32,7 +32,7 @@ the molecule in question \cite{first_look_minion}.
   \label{obr:minion}
 \end{figure}
 
-The electric current is measured 4000 times per second (about 10 measurments per nucleobases).
+The electric current is measured 4000 times per second (about 10 measurements per nucleobases).
 Measured values are stored in \textit{.fast5} file. This data is called \textit{raw signal}.
 
 The process of translating current measures into a sequence of bases (letters A, C, G, T) is called
@@ -46,7 +46,7 @@ median normalization proposed by Stoiber et. al. \cite{batmendijn_bakalarka}
 
 \subsection{Signal conversion to nucleobases}
 
-The normalized signal is then translated into nucleobases. Nucleobase value is depenant also by $k$
+The normalized signal is then translated into nucleobases. Nucleobase value is dependant also by $k$
 consecutive nucleobases, called \textit{K-mers}. 
 
 There are multiple existing translators, but the translation is a slow process usually based on

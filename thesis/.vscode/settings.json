@@ -1,5 +1,30 @@
 {
   "cSpell.words": [
-    "indels"
+    "analyte",
+    "basecalling",
+    "bioinformatics",
+    "indels",
+    "nanopore",
+    "nanopores",
+    "nanoporous",
+    "needleman",
+    "nucleobase",
+    "nucleobases",
+    "polynucleotides",
+    "stoiber",
+    "wunsch"
+  ],
+  "cSpell.ignoreWords": [
+    "atrix",
+    "blosum",
+    "bstitution",
+    "chuba",
+    "henikoff",
+    "itakura",
+    "jorja",
+    "kapitoly",
+    "mers",
+    "prikaz",
+    "sakoe"
   ]
 }
