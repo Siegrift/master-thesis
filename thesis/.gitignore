@@ -1,4 +1,11 @@
-!main.tex
-main.*
-__latexindent_temp.tex
-.vscode
+/*.aux
+/*.bbl
+/*.blg
+/*.lof
+/*.lot
+/*.out
+/*.toc
+/*.log
+/*.fls
+/*.fdb_latexmk
+/*.gz
