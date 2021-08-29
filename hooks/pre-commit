@@ -1,0 +1,3 @@
+# Copy this file to ".git/hooks" in order to build the PDF on every commit
+cd thesis
+exec ./build-pdf.sh
