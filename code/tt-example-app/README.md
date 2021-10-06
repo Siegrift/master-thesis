@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Setup
+
+We use the next JS dependency cloned locally. When there is a change in those sources,
+you have to reinstall the dependencies manually:
+
+```sh
+yarn install --force
+```
+
 ## Getting Started
 
 First, run the development server:
