@@ -11,13 +11,24 @@ const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
   createServer((req, res) => {
+    // Add trusted types CSP headers
+    res.setHeader('Content-Security-Policy', 'trusted-types default')
+    res.setHeader('Content-Security-Policy', "require-trusted-types-for 'script'")
+
+    // Be sure to pass `true` as the second argument to `url.parse`.
+    // This tells it to parse the query portion of the URL.
     // Be sure to pass `true` as the second argument to `url.parse`.
     // This tells it to parse the query portion of the URL.
     const parsedUrl = parse(req.url, true)
     const { pathname, query } = parsedUrl
 
-    res.setHeader('Content-Security-Policy', 'trusted-types webpack default')
-    app.render(req, res, pathname, query)
+    if (pathname === '/a') {
+      app.render(req, res, '/a', query)
+    } else if (pathname === '/b') {
+      app.render(req, res, '/b', query)
+    } else {
+      handle(req, res, parsedUrl)
+    }
   }).listen(3000, (err) => {
     if (err) throw err
     console.log('> Ready on http://localhost:3000')
