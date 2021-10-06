@@ -1,0 +1,3 @@
+[submodule "code/next.js"]
+	path = code/next.js
+	url = git@github.com:Siegrift/next.js.git
