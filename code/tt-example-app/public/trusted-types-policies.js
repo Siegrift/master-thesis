@@ -5,8 +5,9 @@ const whitelistAllAndLog = (name) => (value, sink) => {
   return value
 }
 
-window.trustedTypes.createPolicy('default', {
-  createHTML: whitelistAllAndLog('createHTML'),
-  createScript: whitelistAllAndLog('createScript'),
-  createScriptURL: whitelistAllAndLog('createScriptURL'),
-})
+// NOTE: We use the "Report-Only" mode of CSP instead of this
+// window.trustedTypes.createPolicy('default', {
+//   createHTML: whitelistAllAndLog('createHTML'),
+//   createScript: whitelistAllAndLog('createScript'),
+//   createScriptURL: whitelistAllAndLog('createScriptURL'),
+// })
