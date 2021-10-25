@@ -13,6 +13,9 @@ module.exports = {
     path: paths.build,
     filename: "[name].bundle.js",
     publicPath: "/",
+    trustedTypes: {
+      policyName: "tt-webpack",
+    },
   },
 
   // Customize the webpack build process
