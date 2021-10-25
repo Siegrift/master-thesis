@@ -1,3 +1,6 @@
 [submodule "code/next.js"]
 	path = code/next.js
 	url = git@github.com:Siegrift/next.js.git
+[submodule "code/tt-webpack-starter"]
+	path = code/tt-webpack-starter
+	url = git@github.com:Siegrift/tt-webpack-starter.git
