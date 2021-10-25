@@ -12,8 +12,10 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
   createServer((req, res) => {
     // Add trusted types CSP headers
-    res.setHeader('Content-Security-Policy-Report-Only', 'trusted-types default webpack-policy')
-    res.setHeader('Content-Security-Policy-Report-Only', "require-trusted-types-for 'script'")
+    res.setHeader(
+      'Content-Security-Policy-Report-Only',
+      "trusted-types default webpack-policy; require-trusted-types-for 'script'",
+    )
 
     // Be sure to pass `true` as the second argument to `url.parse`.
     // This tells it to parse the query portion of the URL.
