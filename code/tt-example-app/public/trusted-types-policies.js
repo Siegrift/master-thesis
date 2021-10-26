@@ -1,6 +1,6 @@
-const whitelistAllAndLog = (name) => (value, sink) => {
+const whitelistAllAndLog = (name) => (value, type, sink) => {
   console.groupCollapsed(`Ignoring trusted types violation in policy: ${name}`)
-  console.info({ value, sink })
+  console.info({ value, type, sink })
   console.groupEnd()
   return value
 }
@@ -11,6 +11,13 @@ const whitelistAllAndLog = (name) => (value, sink) => {
 // Enforcement + default policy breaks fast (+ can ignore certain sinks)
 window.trustedTypes.createPolicy('default', {
   // createHTML: whitelistAllAndLog('createHTML'),
-  // createScript: whitelistAllAndLog('createScript'),
+  createScript: (value, type, sink) => {
+    // Ignore eval violation
+    if (sink === 'eval') {
+      return value
+    }
+
+    throw Error('Unsafe value')
+  },
   // createScriptURL: whitelistAllAndLog('createScriptURL'),
 })
