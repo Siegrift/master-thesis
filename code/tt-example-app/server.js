@@ -14,7 +14,7 @@ app.prepare().then(() => {
     // Add trusted types CSP headers
     res.setHeader(
       'Content-Security-Policy-Report-Only',
-      "trusted-types default webpack-policy; require-trusted-types-for 'script'",
+      "trusted-types default webpack-policy next; require-trusted-types-for 'script'",
     )
 
     // Be sure to pass `true` as the second argument to `url.parse`.

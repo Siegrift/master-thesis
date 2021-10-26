@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "setup": "yarn install --force && rm -r .next/cache",
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
