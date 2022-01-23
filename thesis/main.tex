@@ -7,6 +7,9 @@
 \usepackage{url}
 \usepackage[hidelinks,breaklinks]{hyperref}
 \usepackage{float}
+\usepackage{hyperref} % https://texblog.org/2012/03/21/cross-referencing-list-items/
+\usepackage{listings} % https://www.overleaf.com/learn/latex/Code_listing
+
 %\usepackage[slovak]{babel} % vypnite pre prace v anglictine
 \linespread{1.25} % hodnota 1.25 by mala zodpovedat 1.5 riadkovaniu
 
@@ -218,15 +221,13 @@ implement one or more of the challenging ones.
 
 \mainmatter
 
+\input definitions.tex
 
-% \input uvod.tex 
+\input intro.tex
 
-% \input dnaSequencing.tex
+\input tt_integration.tex
 
-% \input sequenceAlignment.tex
-%\input latex.tex
-
-%\input lorem.tex
+\input next-tt.tex
 
 %\input zaver.tex
 

@@ -1,0 +1,23 @@
+\chapter*{Concepts and definitions} % chapter* je necislovana kapitola
+\addcontentsline{toc}{chapter}{Concepts and definitions} % rucne pridanie do obsahu
+\markboth{Concepts and definitions}{Concepts and definitions} % vyriesenie hlaviciek
+\label{definitions}
+
+% Need to use "enumerate" otherwise linking stops working. See:
+% https://texblog.org/2012/03/21/cross-referencing-list-items/
+\begin{enumerate}
+  \item \label{def:dom_source_sink} \textbf{DOM source and sink} - In the context of XSS, a DOM
+        source is the location from which untrusted data is taken by the application (which can be
+        controlled by user input) and passed on to the sink (e.g. location, cookies). Sinks are the
+        places where untrusted data coming from the sources is actually getting executed resulting
+        in DOM XSS (e.g. eval, element.innerHTML) \cite{source_sink_definition}.
+  \item \label{def:hot_reload} \textbf{Hot reload} - Hot reload just displays the code changes
+        according to new code changes without restarting the app.
+  \item \label{def:dom_xss} \textbf{DOM XSS} - DOM Based XSS is an XSS attack wherein the attack
+        payload is executed as a result of modifying the DOM environment in the victim's browser
+        used by the original client side script, so that the client side code runs in an
+        "unexpected" manner \cite{owasp_dom_xss_def}.
+  \item \label{def:csp} \textbf{CSP} - Content Security Policy (CSP) is an added layer of security
+        that helps to detect and mitigate certain types of attacks, including XSS and data injection
+        attacks \cite{mdn_csp_def}.
+\end{enumerate}
