@@ -4,8 +4,9 @@
    source](https://github.com/facebook/react/pull/16157#issuecomment-529956920), because the integration is hidden behind
    the feature flag. When building the version, be sure to check out of a particular React version(by checking out the version tag - e.g. `v17.0.2`).
 2. You have to enable Trusted Types via CSP header or use the `<meta http-equiv=...>` tag in the `index.html`.
-3. After this, you will be able to use `dangerouslySetInnerHTML` with a Trusted Type value and React will accept it, but
-   webpack hot reload will break (since the webpack configuration is abstracted by react-scripts of CRA).
+3. After this, you will be able to use unsafe properties and attributes such as `iframe.srcDoc` with a Trusted Type
+   value and React will accept it. However webpack hot reload will break (since the webpack configuration is abstracted
+   by react-scripts of CRA).
 4. Trusted Types integration in webpack must be turned on [in the webpack
    config](https://webpack.js.org/guides/csp/#trusted-types).
 5. You can either edit the webpack config hidden in `node_modules` of the react scripts and place there:

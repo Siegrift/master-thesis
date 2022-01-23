@@ -10,9 +10,9 @@ function App() {
     <div className="App">
       <h1>Trusted Types are enabled in this site</h1>
       <button onClick={() => toggleSafe(!safe)}>Toggle safe</button>
-      {safe && <div dangerouslySetInnerHTML={{ __html: __allowUnsafeValue('<p>hi<p/>') as any }}></div>}
+      {safe && <iframe title="safe" srcDoc={__allowUnsafeValue('<p>hi<p/>') as any}></iframe>}
       <button onClick={() => toggleUnsafe(!unsafe)}>Toggle unsafe</button>
-      {unsafe && <div dangerouslySetInnerHTML={{ __html: '<p>hi<p/>' }}></div>}
+      {unsafe && <iframe title="unsafe" srcDoc={'<p>hi<p/>'}></iframe>}
     </div>
   )
 }
