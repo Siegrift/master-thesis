@@ -1,0 +1,41 @@
+\chapter{Introduction}
+
+\section{Trusted Types}
+
+Trusted Types is a relatively modern web API designed by Google based on a long history of
+mitigating XSS \cite{tt_design_history}.
+
+It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM XSS
+(\ref{def:dom_xss}). Trusted Types provide type guarantees to all frontend code by enforcing
+security type checks directly in the web browser. They are delivered through a CSP (\ref{def:csp})
+header and have a report-only mode that does not change application behavior and an enforcement mode
+that may cause user-observable breakages \cite{tt_background}.
+
+When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
+called with values that have not passed through a Trusted Types policy \cite{tt_background}.
+
+There are many other resources which can be used to explore Trusted Types in depth
+\cite{tt_resources}.
+
+\section{Web frameworks and libraries}
+
+Web frameworks and libraries is a software that is designed to support development of web
+applications and services related to web applications. Frameworks try to solve common problems faced
+in web development, such as building and reusing user interfaces, managing state, performing API
+requests and enforcing the best security practices.
+
+\subsection{Next.js}
+\label{intro-nextjs}
+
+Next.js is one of the most popular frameworks for building web applications. The framework is build
+upon React library which is the most used library as of 2021 \cite{react_most_used_2021}. There are
+many reasons for why Next.js is among the most popular frameworks. Notably, it is opinionated about
+how the application backend should work. This design choice allows Next.js to decide the best
+possible way to build a particular web page. The important fact to take away is that Next.js is not
+only about the client side (the DOM), but it can also handle server side rendering, data processing,
+API requests which open up different means of attacks such as reflected XSS, SQL injections and
+more.
+
+Next.js is a complex framework when looking at the source code. As of Oct 6, 2021 it consists of
+more then 200,000 lines of code. Looking at each file or have a complete understanding of the
+entire codebase is impossible for external contributor.
