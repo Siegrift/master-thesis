@@ -1,3 +1,28 @@
+# --- Trusted Types documentation ---
+
+1. To be able to use Trusted Types with React, you have to manually [build it from
+   source](https://github.com/facebook/react/pull/16157#issuecomment-529956920), because the integration is hidden behind
+   the feature flag. When building the version, be sure to check out of a particular React version(by checking out the version tag - e.g. `v17.0.2`).
+2. You have to enable Trusted Types via CSP header or use the `<meta http-equiv=...>` tag in the `index.html`.
+3. After this, you will be able to use `dangerouslySetInnerHTML` with a Trusted Type value and React will accept it, but
+   webpack hot reload will break (since the webpack configuration is abstracted by react-scripts of CRA).
+4. Trusted Types integration in webpack must be turned on [in the webpack
+   config](https://webpack.js.org/guides/csp/#trusted-types).
+5. You can either edit the webpack config hidden in `node_modules` of the react scripts and place there:
+
+```json
+// https://github.com/facebook/create-react-app/blob/5614c87bfbaae0ce52ac15aedd2cd0f91ffd420d/packages/react-scripts/config/webpack.config.js#L212
+trustedTypes: {
+  policyName: 'webpack-policy',
+},
+```
+
+But this is unreliable, since it will get erased on every `yarn install` and is not well scriptable since the
+node_modules hierarchy is not strictly defined.
+
+6. Gladly, editing webpack configuration is a very common problem and people already figured out workarounds, such as
+   this one: https://github.com/facebook/create-react-app/issues/10307#issuecomment-898889701
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
