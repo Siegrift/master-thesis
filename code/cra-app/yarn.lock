@@ -7031,9 +7031,12 @@ react-dev-utils@^12.0.0:
     strip-ansi "^6.0.1"
     text-table "^0.2.0"
 
-"react-dom@link:../react/build/node_modules/react-dom":
-  version "0.0.0"
-  uid ""
+"react-dom@file:../react/build/node_modules/react-dom":
+  version "17.0.0"
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    scheduler "^0.20.0"
 
 react-error-overlay@^6.0.10:
   version "6.0.10"
@@ -7110,9 +7113,11 @@ react-scripts@5.0.0:
   optionalDependencies:
     fsevents "^2.3.2"
 
-"react@link:../react/build/node_modules/react":
-  version "0.0.0"
-  uid ""
+"react@file:../react/build/node_modules/react":
+  version "17.0.0"
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 readable-stream@^2.0.1:
   version "2.3.7"
