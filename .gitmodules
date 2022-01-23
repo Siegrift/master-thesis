@@ -4,3 +4,6 @@
 [submodule "code/tt-webpack-starter"]
 	path = code/tt-webpack-starter
 	url = git@github.com:Siegrift/tt-webpack-starter.git
+[submodule "code/react"]
+	path = code/react
+	url = git@github.com:Siegrift/react.git
