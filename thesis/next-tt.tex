@@ -9,8 +9,6 @@ the application and Next.js code and we ended up with a working version of a bla
 running in dev mode with Trusted Types aware Next.js as a dependency. However, we decided not to
 pursue this project no more and shifted focus to a different target.
 
-% TODO: Link to the chapter of the next target
-
 \section{Fixing violations reported by Tsec}
 
 Tsec found 8 violations \cite{tsec_output} inside Next.js sources. Out of these 7 were indeed
@@ -23,6 +21,8 @@ Since our utmost goal was to find the sinks and create a prototype for the integ
 all of these values in Trusted Types objects. This was to be revisited in the future.
 
 \section{Fixing the dev mode of an example application}
+
+% TODO: Mention configuration in webpack 5
 
 Fixing the violations found by Tsec was not enough and the application still wouldn't launch with
 Trusted Types enforced. The reason for this hasn't been clear, but it was probably a webpack plugin

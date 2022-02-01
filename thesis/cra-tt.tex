@@ -1,0 +1,46 @@
+\chapter{Trusted Types integration into Create React App}
+
+Create React App (CRA) (described in \ref{intro-cra}) was a second choice for integrating Trusted
+Types. After taking a look in the implementation of CRA we found that this tool doesn't depend on
+React directly, but only installs it after creating the project template. Our goal was to make sure
+the generated project by CRA is Trusted Types compatible.
+
+\section{Using Trusted Types compatible version of React}
+
+To accomplish this, we would need to change the implementation of CRA to install Trusted Types
+compatible version of React. Unfortunately, such version of React is implemented under a feature
+flag which needs to be turned on at build time. The published version of React contains the already
+built files with the feature flag turned off. This means that if you want to use the Trusted Types
+compatible version of React you have to clone the React repository from sources, turn on the feature
+flag and then build the framework. You can then use this version of React as a dependency in your
+project.
+
+Implementing this is non trivial, since it requires knowledge about React. More importantly though,
+this is harder to maintain for the application authors since you need to keep up with the new
+releases of React manually.
+
+\section{Using Trusted Types compliant version of Webpack}
+
+CRA internally uses webpack version 5 to provide fast development experience with convenient
+features, such as hot reload. For production it handles minification and other optimizations. Some
+of these features, especially hot reload breaks under Trusted Types in enforcement mode. Gladly,
+webpack can be configured to be Trusted Types compliant by a small configuration change
+\cite{webpack_tt_config}.
+
+The problem with CRA is that the webpack configuration is abstracted away from the user. This means
+that there is not a simple way how to change the configuration. One can find the webpack
+configuration in the downloaded dependencies and change it there directly, but this won't really
+work since those changes will be removed by the package manager when modifying the dependencies. In
+general, one should never modify the contents of dependencies and treat it only as an output of a
+package manager.
+
+The optimal solution as of now is to use a package which allows you to spy on modules and change
+what they return. This pattern is often used when mocking or spying in unit tests. However, it is
+also a suitable workaround for this case \cite{cra_modify_webpack_config}. CRA team is reluctant to
+change this, since the hidden configuration is a good default for the majority of users.
+
+Another option is to use the \textit{eject} command from CRA. This is a one way operation and it
+essentially unwraps all of the hidden configuration and creates these files in your project. You can
+then simply edit the webpack configuration which is now part of your project. This is not
+recommended and it should be used only when all other attempts fail. The generated webpack
+configuration is pretty complex and updating it in the future might not be trivial.
