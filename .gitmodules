@@ -7,3 +7,9 @@
 [submodule "code/react"]
 	path = code/react
 	url = git@github.com:Siegrift/react.git
+[submodule "code/cypress"]
+	path = code/cypress
+	url = git@github.com:Siegrift/cypress.git
+[submodule "code/jquery"]
+	path = code/jquery
+	url = git@github.com:Siegrift/jquery.git
