@@ -13,3 +13,6 @@
 [submodule "code/jquery"]
 	path = code/jquery
 	url = git@github.com:Siegrift/jquery.git
+[submodule "code/cypress-trusted-types"]
+	path = code/cypress-trusted-types
+	url = git@github.com:Siegrift/cypress-trusted-types.git
