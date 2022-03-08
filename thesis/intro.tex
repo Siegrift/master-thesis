@@ -7,15 +7,224 @@ mitigating XSS \cite{tt_design_history}.
 
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM XSS
 (\ref{def:dom_xss}). Trusted Types provide type guarantees to all frontend code by enforcing
-security type checks directly in the web browser. They are delivered through a CSP (\ref{def:csp})
-header and have a report-only mode that does not change application behavior and an enforcement mode
-that may cause user-observable breakages \cite{tt_background}.
+security type checks directly in the web browser. They are delivered through a CSP header and have a
+report-only mode that does not change application behavior and an enforcement mode that may cause
+user-observable breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
 called with values that have not passed through a Trusted Types policy \cite{tt_background}.
 
 There are many other resources which can be used to explore Trusted Types in depth
 \cite{tt_resources}.
+
+\subsection{Threat model}
+
+Trusted Types is a powerful API with a well scoped threat model. The main goals of the API are
+\cite{tt_spec:goals}:
+
+\begin{itemize}
+  \item Reduce the risk of client side vulnerabilities caused by powerful and insecure by default
+        DOM APIs
+  \item Replace the insecure by default APIs with safer alternatives which are hard to misuse
+  \item Encourage a design where the code affecting the application security is encapsulated in a
+        small part of an application
+  \item Reduces the security review surface for applications and libraries
+\end{itemize}
+
+The main idea behind Trusted Types is to replace the dangerous APIs with safer alternatives. It is
+very tempting to extend the threat model of Trusted types to cover other surfaces such as various
+server side attacks. However, this is a very complex area and it is part of the non goals of Trusted
+Types \cite{tt_spec:non_goals}:
+
+\begin{itemize}
+  \item Prevent or mitigate server side generated markup attacks. To address these solutions, use
+        the existing recommended solutions like templating systems or CSP script-src
+  \item Control subresource loading. Trusted Types deal with code running in realm of the current
+        document and does not guard subresources
+  \item Guard cross origin JavaScript execution, for example loading new documents via data: URLs
+  \item Protect against malicious developers of the web application
+\end{itemize}
+
+\subsection{Content Security Policy (CSP)}
+\label{csp}
+
+Trusted Types are enabled through a CSP (\ref{def:csp}) using two directives:
+
+\begin{itemize}
+  \item \textit{require-trusted-types-for} - This directive instructs user agents to control the
+        data passed to DOM XSS sink functions (\cite{mdn:require-trusted-types-for}).
+
+        \bigskip
+        % NOTE: To remove vertical space when using listing without caption \begin{lstlisting}[language={}, belowskip=-1.2 \baselineskip]
+        \begin{lstlisting}[language={}, caption=Syntax of require-trusted-types-for directive]
+Content-Security-Policy: require-trusted-types-for 'script';\end{lstlisting}
+
+  \item \textit{trusted-types} - This directive instructs user agents to restrict the creation of
+        Trusted Types policies (\cite{mdn:trusted-types}). Syntax:
+
+        \bigskip
+        \begin{lstlisting}[language={}, caption=Syntax of trusted-types directive]
+Content-Security-Policy: trusted-types;
+Content-Security-Policy: trusted-types 'none';
+Content-Security-Policy: trusted-types <policyName>;
+Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicates';\end{lstlisting}
+
+\end{itemize}
+
+These directives together enable and configure Trusted Types behaviour for the particular web page.
+They allow the application authors to define rules guarding writing values to the DOM sinks and thus
+reducing the DOM XSS attack surface to small, isolated parts of the web application codebase,
+facilitating their monitoring and code review.
+
+Apart from the standard \textit{Content-Security-Policy} header there is also
+\textit{Content-Security-Policy-Report-Only} which you can use to enable Trusted Types in report
+only mode. This way the application can gradually work on Trusted Types compliance without breaking
+the existing application.
+
+Once the Trusted Types are enabled with the regular or the report only CSP, the browser changes the
+behaviour of insecure DOM API sinks and expects "trusted" values instead of regular strings. These
+trusted values are created via Trusted Types policies.
+
+\subsection{Trusted Types policies}
+\label{subsec:tt_policy}
+
+The core part of Trusted Types API are policies which are factory functions for creating "trusted"
+values which can be assigned to DOM sinks when Trusted Types are enabled. The policies are created
+by the application and access to them should be restricted. In javascript this can be easily
+achieved by creating a policy in it own module and exporting only a very specific functions which
+use this policy internally.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Creating Trusted Types policy, label={lst:create_tt_policy}]
+const identity = (id) => id
+const createHTMLCallback = identity;
+const createScriptCallback = identity;
+const createScriptURLCallback = identity;
+const myPolicy = window.trustedTypes.createPolicy('my-policy', {
+  createHTML: createHTMLCallback,
+  createScript: createScriptCallback,
+  createScriptURL: createScriptURLCallback,
+});
+\end{lstlisting}
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Create trusted value using a policy]
+const trustedHtml = myPolicy.createHTML("<span>safe html</span>");
+\end{lstlisting}
+
+The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using the callback
+functions. This callback function is called when the policy is used to create a trusted value. It
+receives the sink value of string type as an argument and has to return a string value that is XSS
+free and thus can be trusted. In practice, this function may be implemented as identity if the
+payload is known to be safe. Another good example would be to sanitize the sink value inside this
+callback. In case the payload should not be used, you can return null or undefined which will
+trigger a Trusted Types violation. The callback function should never throw.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
+const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
+  createHTML: (unsafeValue) => DOMPurify.sanitize(unsafeValue),
+});
+\end{lstlisting}
+
+\subsection{Default policy}
+
+% TODO: This is inconsistent in the spec
+There is one special case for Trusted Types policies. Application may use create a policy called
+"default". This policy has special behaviour. When a string value is passed to a DOM sink when
+Trusted Types are enforced, the user agent will implicitely call pass the unsafe value through the
+default policy with the string payload, sink type and sink name respectively instead of triggering a
+Trusted Types violation immediately. This allows the application to recover from an unexpected sink
+usage, for example by sanitizing the unsafe value. If the default policy does not exist or returns
+null or undefined a CSP violation will be triggered \cite{tt_spec:default_policy}.
+
+This feature is intended to be used by applications with legacy code that uses injection sinks. The
+callback functions of the policy should be defined with very strict rules to prevent bypassing
+security restrictions enforced by Trusted Types API. For example, having an "accept all" default
+policy defeats the whole purpose of Trusted Types API. Developers should be very cautious when using
+the default policy and preferably use it only for a transition period until the legacy code is
+refactored not to use the dangerous DOM sinks \cite{tt_spec:default_policy}.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Creating a default policy \cite{tt_spec:default_policy}]
+trustedTypes.createPolicy('default', {
+  createScriptURL: (value, type, sink) => {
+    return value +
+      '?default-policy-used&type=' +
+      encodeURIComponent(type) +
+      '&sink=' +
+      encodeURIComponent(sink);
+  }
+});
+\end{lstlisting}
+
+\subsection{Reviewability}
+
+Consider the problem of security reviews of web applications. There are many tools and methodologies
+which can help reason about the application security, but there is no automated way that can assert
+the application safety. This means that it is still necessary for security engeneers to manually
+review the implementation and look for potential vulnerabilities and analyze them. Depending on the
+implementation this may be easy or it can be difficult process.
+
+When focusing on client side XSS safety, the engineer has assess whether application uses dangerous
+DOM sinks and whether there is way for attacker to misuse this.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Possibly dangerous function]
+function setHtml(element, html) {
+  element.innerHTML = html;
+}
+\end{lstlisting}
+
+Is the function in the listing above safe? There is not enough information to answer this. The
+safety of this function depends on how it is used. More generally, the safety of this function
+depends on it direct and indirect callers, both present and future ones \cite{tt_design_history}.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Usage of the possibly dangerous function, label={lst:dangerous_fn_usage}]
+  function processHtml(html) {
+    setHtml(document.body, html);
+  }
+
+  function processUserData(data) {
+    log('Processing user data');
+    // Is this safe? Can this call change "data.html"?
+    someThirdPartyCall(data);
+    processHtml(data.html);
+  }
+\end{lstlisting}
+
+Looking for the callers of the function is difficult because of the dynamic nature and of
+JavaScript. Also, JavaScript is a mutable language which makes it harder to reason about function
+calls, especially the third party ones.
+
+When the application enforces Trusted Types, the engineer doesn't have to care about the dangerous
+functions and its callers. The focus of the security review shifts to reasoning about the creation
+of trusted values and policies. Once a trusted value is created it is immutable and the policy which
+created it is guarantees the security. When a trusted value reaches a sink, this guarantee still
+holds independently of how the value passed around in the future callers. Consider the third party
+call in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains a
+TrustedHTML value. If the third party call modified this value a violation would be thrown when
+passed to the DOM sink. It could also replace the trusted value with a different TrustedHTML value.
+However, the new value is again trusted, so this is not a security vulnerability, but an application
+feature.
+
+This design reduces the code surface of application during security reviews and makes it easier to
+reason about the application security.
+
+\subsection{Browser support and polyfill}
+
+Trusted Types are currently supported in Chromium family of browsers \cite{mdn:tt_compatibility}.
+Developers creating Trusted Types compliant application should always check if Trusted Types are
+available in the current execution context, which does not necessary need to be a browser. It is
+very common for nodeJS applications to pre render the client side code on the server to provide
+faster experience for the end users. This brings additional complexity and new attack vectors in
+forms of reflected XSS, various kinds of injection and more, which are out of the threat model under
+which Trusted Types operate.
+
+The good thing about Trusted Types is that once the application is Trusted Types compliant then all
+of the application sinks are protected and thus the application has the same security properties in
+browsers where Trusted Types are supported and in the ones where they are not.
 
 \section{Web frameworks and libraries}
 
