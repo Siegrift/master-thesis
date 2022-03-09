@@ -1,0 +1,145 @@
+\chapter{Testing}
+
+
+Trusted Types are agnostic to the testing framework used and type of tests. It is very common for
+web application to have a combination of unit and end to end tests. The former are used to smaller
+parts of application and typically run in nodeJS environment. The latter usually test the whole
+application in browser environment and focus on the full application as a product.
+
+\section{Cypress}
+
+Cypress is one of the most popular frameworks for end to end testing of web applications
+\cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
+tests in real browsers and is fast and reliable due to its unique architecture.
+
+Since the tests run in a browser developers can test the Trusted Types compliance of their
+application. Cypress loads the user application in an iframe, in which Trusted Types can be enforced
+without the need for Trusted Types compliance of Cypress itself. This means that Cypress commands
+are allowed to use dangerous sinks, because they run outside of the iframe. This is extremely
+important, because it makes all of the existing Cypress ecosystem work out of the box under Trusted
+Types enforcement.
+
+\subsection{Trusted Types plugin}
+
+Even though Cypress supports Trusted Types out of the box, there are a few nuances the developer has
+to overcome to be able to test the application and Trusted Types violations. For this reason, we
+have created a Cypress plugin which abstracts the low level details and provides a nicer API for the
+developers to use.
+
+\begin{flushleft}\textbf {Removed CSP header}\end{flushleft}
+
+Cypress removes the CSP header sent by the application server in order to load the application in an
+iframe, which could be prevented by a \textit{scriptSrc} CSP directive. There is a workaround for
+now, which is to intercept the request of the initial HTML application payload and copy the CSP
+policy from the response headers to the response body inside a \textit{meta} tag.
+\cite{cypress:csp_removal_issue}.
+
+This is tedious for the developers, so we have created a custom command in our plugin which does
+exactly this.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Intercept requests and enable CSP header inside via meta tag]
+// NOTE: Based on https://glebbahmutov.com/blog/testing-csp-almost/
+Cypress.Commands.add('enableCspThroughMetaTag', (options) => {
+  const { urlPattern } = options ?? {};
+
+  // Intercept all requests by default
+  cy.intercept(urlPattern ?? '**/*', (req) => {
+    return req.reply((res) => {
+      const csp = res.headers['content-security-policy'];
+      if (!csp || typeof res.body !== 'string') return;
+
+      res.body = res.body
+        .replace(
+          new RegExp('<head>([\\s\\S]*)</head>'),
+          new RegExp(`<head><meta http-equiv="Content-Security-Policy" content="${csp}">$1</head>`).toString()
+        )
+        // The following are needed because the regex replacement above inserts some characters
+        .replace('/<head>', '<head>')
+        .replace('<\\/head>/', '</head>');
+    });
+  }).as('enableCspThroughMetaTag');
+});
+\end{lstlisting}
+
+\begin{flushleft}\textbf {Testing the violations}\end{flushleft}
+
+While it is easy to test that the Trusted Types are supported (\ref{lst:cypress_test_tt_support}) it
+is harder to test whether part of the code triggered Trusted Types violation. The reason is that the
+violation does not produce any user visible behaviour because the DOM is unchanged and uncaught
+exception is thrown and Cypress automatically fails the test. The developer needs to listen to
+\textit{uncaught:exception} handler from Cypress and explicitely recognize the Trusted Types
+violation based on the error thrown and tell Cypress that this error is intended so it doesn't fail
+the test.
+
+% To prevent the code to span two pages
+\bigskip
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Test Trusted Types support, label={lst:cypress_test_tt_support}]
+it('supports TT', () => {
+  expect(window.trustedTypes).not.to.be.undefined;
+});
+\end{lstlisting}
+
+To simplify this low level handling for the developers we have created a custom command which
+recognizes Trusted Types violations and remembers them for the lifetime of the current test so they
+can be asserted later on.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Custom command to catch Trusted Types violations]
+Cypress.Commands.add('catchTrustedTypesViolations', () => {
+  if (catchTrustedTypesViolationsEnabled) return;
+  catchTrustedTypesViolationsEnabled = true;
+  cy.clearTrustedTypesViolations();
+
+  // https://docs.cypress.io/api/events/catalog-of-events#To-catch-a-single-uncaught-exception
+  cy.on('uncaught:exception', (err) => {
+    const violationTypes = ['TrustedHTML', 'TrustedScript', 'TrustedScriptURL'] as const;
+    const type = violationTypes.find((type) => err.message.includes(formatViolationMessage(type)));
+    if (type) {
+      trustedTypesViolations.push({
+        message: formatViolationMessage(type),
+        error: err,
+      });
+      // Return false to prevent the error from failing this test
+      return false;
+    }
+
+    const policyCreationErrorMessage = formatViolationMessage('PolicyCreation');
+    if (err.message.includes(policyCreationErrorMessage)) {
+      trustedTypesViolations.push({
+        message: policyCreationErrorMessage,
+        error: err,
+      });
+      // Return false to prevent the error from failing this test
+      return false;
+    }
+  });
+});
+\end{lstlisting}
+
+The final part of the plugin is the API to assert the caught violations. There are multiple commands
+which assert that certain types of violations happened. An example of a full Cypress test which
+asserts the violation is listed in (\ref{lst:cypress_test}).
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Example Trusted Types violation test, label={lst:cypress_test}]
+it('assertTrustedTypesViolations', () => {
+  cy.enableCspThroughMetaTag();
+  cy.catchTrustedTypesViolations();
+  cy.visit(url);
+
+  cy.contains('unsafe html').click();
+  cy.contains('unsafe html').click();
+  cy.contains('duplicate policy').click();
+  cy.contains('unsafe script').click();
+
+  cy.assertTrustedTypesViolations(['TrustedHTML', 'TrustedHTML', 'PolicyCreation', 'TrustedScript']);
+});
+\end{lstlisting}
+
+\begin{flushleft}\textbf {Releasing the plugin}\end{flushleft}
+
+The plugin is implemented in a standalone repository \cite{cypress-trusted-types:github} and
+published as an npm package \cite{cypress-trusted-types:npm} for everyone to use. Together with the
+plugin API there is an example application and tests which showcase the plugin in action.
