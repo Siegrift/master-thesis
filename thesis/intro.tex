@@ -1,15 +1,48 @@
 \chapter{Introduction}
 
+\section{Cross site scripting (XSS)}
+
+Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
+of web applications taking untrusted user input and interpreting is as code without sanitization or
+escaping. The XSS has many subcategories, for this paper the most important is DOM XSS
+(\ref{def:dom_xss}), where the injection happens on the client side \cite{tt_web_framework_paper}.
+
+This vulnerability became more widespread with the boom of single page applications where most of
+the application behaviour is achieved by modifying the DOM using JavaScript. There are many
+functions in the DOM API which interpret the arguments as executable code thus making it easy for
+developers to accidentally introduce this vulnerability \cite{tt_web_framework_paper}.
+
+There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
+former usually suffer from performance and scalability issues when applied on large codebases while
+the latter provide suboptimal results due to JavaScript dynamic nature
+\cite{tt_web_framework_paper}.
+
+\bigskip
+\begin{lstlisting}[language={}, caption=Examples of DOM XSS attack vectors \cite{dom_xss_portswigger} \cite{tt_web_framework_paper}]
+document.write()
+document.writeln()
+document.domain
+element.innerHTML
+element.outerHTML
+element.insertAdjacentHTML
+element.onevent
+DomParser.parseFromString
+frame.srcdoc
+eval()
+script.src
+Worker()
+\end{lstlisting}
+
 \section{Trusted Types}
 
 Trusted Types is a relatively modern web API designed by Google based on a long history of
 mitigating XSS \cite{tt_design_history}.
 
-It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM XSS
-(\ref{def:dom_xss}). Trusted Types provide type guarantees to all frontend code by enforcing
-security type checks directly in the web browser. They are delivered through a CSP header and have a
-report-only mode that does not change application behavior and an enforcement mode that may cause
-user-observable breakages \cite{tt_background}.
+It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
+XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
+directly in the web browser. They are delivered through a CSP header and have a report-only mode
+that does not change application behavior and an enforcement mode that may cause user-observable
+breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
 called with values that have not passed through a Trusted Types policy \cite{tt_background}.
@@ -223,10 +256,19 @@ forms of reflected XSS, various kinds of injection and more, which are out of th
 which Trusted Types operate.
 
 The good thing about Trusted Types is that once the application is Trusted Types compliant then all
-of the application sinks are protected and thus the application has the same security properties in
-browsers where Trusted Types are supported and in the ones where they are not.
+of the application sinks are protected. The author of the application has to rewrite the application
+code to use Trusted Types. If the application uses polyfill for browsers which do not support
+Trusted Types, it results in the same security properties as in browsers where Trusted Types are
+supported \cite{xss_nowhere_with_polyfill}.
 
-% TODO: Explain polyfill
+Browsers which do not support Trusted Types yet can use one of the variants of the polyfill:
+
+\begin{itemize}
+  \item Full - Defined the Trusted Types API, parses the \textit{meta} tag from the HTML and enables
+        the enforcement in the DOM
+  \item API only - Defines the Trusted Types API so you can use policies and create trusted values
+  \item Tiny - Polyfills only the most important part of the API surface with a single line of code
+\end{itemize}
 
 \section{Web frameworks and libraries}
 
@@ -261,3 +303,25 @@ the user.
 
 The source code of this tool is not dependant on React directly. It only focuses on generating the
 project files from the template and then it installs React and other necessary dependencies.
+
+\subsection{Motivation and background}
+
+Trusted Types provide opportunity to significantly reduce the risk of client side XSS and has been
+proven in various scale projects and libraries \cite{tt_web_framework_paper}
+\cite{tt_integration_list}. However, for projects need to refactor parts of their code, which can be
+difficult, especially in the open source world where the software is composed by multiple
+dependencies which can't easily be modified. This presents a large barrier in Trusted Types adoption
+\cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough pressure for
+library authors to migrate to Trusted Types and lot of applications are prevented to migrate because
+their dependencies do not work with Trusted Types.
+
+In our work we try to analyze some of the most popular open source frameworks and libraries and show
+that there are workarounds for applications to use Trusted Types without too much hassle. We also
+stress the need for more tooling and libraries for Trusted Types support, where we see a big
+opportunity for open source contributors to help.
+
+Our position targets the sweet spot between understanding the client side vulnerabilities and
+writing software. There is usually a knowledge gap between security engineers and software
+developers, the former focus on security, the latter on the application features. Trusted Types
+bridge this gap by providing secure by default software and the ideal scenario would be if open
+source libraries used Trusted Types transparently to the application authors.
