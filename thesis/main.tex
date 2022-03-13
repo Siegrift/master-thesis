@@ -96,7 +96,7 @@ captionpos=b
 \def\mfskolitel{RNDr. Peter Borovanský, PhD.}
 
 %ak mate konzultanta, odkomentujte aj jeho meno na titulnom liste, TODO: maybe add koto
-% \def\mfkonzultant{tit. Meno Priezvisko, tit. }  
+\def\mfkonzultant{Krzysztof Kotowicz}
 
 \def\mfmiesto{Bratislava, \mfrok}
 
@@ -167,7 +167,7 @@ captionpos=b
   Field of Study:  & \mfodbor      \\
   Department:      & \mfpracovisko \\
   Supervisor:      & \mfskolitel   \\
-  % Consultant: & \mfkonzultant \\
+  Consultant:      & \mfkonzultant \\
 \end{tabular}
 
 \vfill
@@ -233,13 +233,12 @@ captionpos=b
 % TODO: fill EN abstract
 Trusted Types is a modern Web API which aims to reduce DOM XSS attack surface in web applications.
 They give you the tools to write and maintain applications free of DOM XSS vulnerabilities by making
-the dangerous web API functions secure by default. Currently, they are supported in Chrome, Edge and
-Opera.
+the dangerous web API secure by default. Currently, they are supported in Chrome, Edge and Opera.
 
-Integrating Trusted Types in web application requires code changes. The problem is when these
-changes need to be made in third party code which you can't easily modify. Trusted Types support in
-open source projects is gradually improving and our plan is to analyze these integrations and
-implement one or more of the challenging ones.
+Integrating Trusted Types in web applications and libraries requires code changes. The major problem
+is when these changes need to be made in third party code which you don't have access to and you
+can't easily modify. Trusted Types support in open source projects is gradually improving and our
+plan is to analyze these integrations and implement one or more of the challenging ones.
 
 % TODO: fill in most suitable keywords when the thesis is done
 \paragraph*{Keywords: Trusted Types, Web APIs}

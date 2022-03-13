@@ -1,36 +1,28 @@
 \chapter{Trusted Types integration}
 \label{tt_integration_setup}
 
-% - when adding to libraries it requires a certain setup
-%   - explain experience with FE libaries
-%   - locating sinks and estimating the scope
-%     - e.g. grepping
-%     - tsec
-%     - https://github.com/annkamsk/ttrc ???
-%     - using the library in an application
-% - complex task, hard to asses whether it's 100% correct
-% - hard for applications since the dependencies need to be TT compatible too
-% - risk for libraries and reluctance to merging the PR
-
-Integrating Trusted Types to target applications and libraries is a complex task that requires good
-knowledge of the target inner workings. There is a small sample of already implemented integrations,
-which show that the necessary code changes are relatively small \cite{tt_integration_list}. Each
-integration is different, but on a high level they follow the same steps:
+Integrating Trusted Types to target applications and libraries is a might seem as complex task that
+requires good knowledge of the target inner workings. There is a small sample of already implemented
+integrations, which show that the necessary code changes are relatively small
+\cite{tt_integration_list}. Based on our experience, the integration does not require an exprteese
+of the projects inner workings. This experience is also supported by other integration authors
+\cite{tt_web_framework_paper}. Each integration is different, but on a high level they follow the
+same steps:
 
 \begin{enumerate}
-  \item Locate all of the DOM sinks (\ref{def:dom_source_sink})
+  \item Locate all of the DOM sinks
   \item Find the most suitable workaround for every sink found
-  \item Merging the integration and releasing a new version of the target
+  \item Implement the integration and release a new version of the target
 \end{enumerate}
 
 \section{Locate all of the DOM sinks}
 
 Locating the sinks of the integration target is important for scoping the integration effort and the
-implementation afterwards. This task is complex since the problem of "locating all of the sinks in a
-codebase" generally cannot be proven. This is because JavaScript is a dynamic language and it is
-possible to access and set the sink value dynamically (using the property element access).
+implementation afterwards. This task is complex since there is no bulletproof way of locating all of
+the sinks in a codebase. This is because JavaScript is a dynamic language and it is possible to
+access and set the sink values dynamically using the property element access.
 
-Gladly, there are a few methods and tools, which can help to catch most of the sinks:
+Fortunately, there are a few methods and tools, which can help to catch most of the sinks:
 
 \begin{enumerate}
   \item Static search through the codebase
@@ -41,25 +33,28 @@ Gladly, there are a few methods and tools, which can help to catch most of the s
 \subsection{Static search through the codebase}
 
 This method is the simplest one and arguably the least effective. Statically searching for sinks
-through codebase produces many false positives and it is also possible to miss some. The output of
-the static search is usually cluttered with less important violations in tests and built tools,
-which you need to manually exclude from the search. Nevertheless, this method is easy to reason
-about, fast to iterate and the final search results can provide a good estimate of the integration
-scope. This works well in practice since there is an assumption that the target source code is not
-malicious and doesn't actively use code patterns which are trying to hide or cause an XSS
-vulnerability.
+throughout the codebase produces many false positives and false negatives. The former are produced
+for read only sink usage, the latter when actual sinks are missed due to implementation limitations.
+The output of the static search is usually cluttered with less important violations in tests and
+built tools, which you need to manually exclude from the search.
 
-There is not an actively maintained static search tool, but it is relatively easy to build a script,
-which uses the existing tools such as \textit{grep} with a list of already known sinks
-\cite{xss_sink_finder}.
+Nevertheless, this method is easy to reason about, fast to iterate and the final search results can
+provide a good estimate of the integration scope. This works well in practice since there is an
+assumption that the target source code is not malicious and doesn't actively use code patterns which
+are trying to hide or cause an XSS vulnerability.
+
+There is not an actively maintained static search tool for finding DOM sinks. However, it is
+relatively easy to build a script, which uses the existing tools such as \textit{grep} with a list
+of already known sinks \cite{xss_sink_finder}.
 
 \subsection{Static code analyzers}
 
-A better approach for locating the DOM sinks statically, is to search through the AST of the code.
-The quality of the output produced depends on the quality of the AST information. When the codebase
-is using TypeScript, the AST information is generally richer compared to codebases using JavaScript.
-One can then build and use tools like Tsec \cite{tsec_github} which uses the compiler to parse the
-code and create the AST to ultimately find the sinks in a more reliable manner.
+A better approach at searching for the DOM sinks statically, is to search through the AST of the
+code. The quality of the output produced depends on the quality of the AST information. When the
+codebase is using TypeScript, the AST information is generally richer compared to codebases using
+JavaScript. One can then build and use tools like Tsec \cite{tsec_github} which uses the compiler to
+parse the source code and create the AST to ultimately find the sinks in a more reliable manner and
+produces less false positives.
 
 These tools have an advantage that they can be used to maintain the Trusted Types compatibility even
 after the violations are fixed. For example, they can be run in CI pipeline or their output can be
@@ -76,34 +71,42 @@ increases the chance that the integration is implemented correctly.
 That said, finding a suitable application might be challenging and it may not be an ideal way to
 test all edge cases. For example, when implementing an integration to React, one can find lot of
 real world applications using React, but most of them are already XSS free so you can only verify if
-the integration doesn't break these clients. What you want is to also test how the integration works
-when used with applications that uses the DOM sinks and now has to produce Trusted Types values.
-Another test vector is simulating an attacker by constructing malicious payloads and expect the site
-to break due to Trusted Types violations. These are done best by creating an application from
-scratch by the integration author.
+the integration doesn't break these clients.
 
-\section{Merging the integration and releasing a new version of the target}
+One recommendation for the clients are to use the the report only mode of Trusted Types CSP. This
+allows applications to migrate their code gradually and allows them to focus on application
+features.
 
-Merging the integration and releasing a new version of the target is undoubtedly an important part
+Library authors need to test how the integration works when used with applications that uses the
+DOM sinks and now has to produce Trusted Types values. These are done best by creating an
+application from scratch by the integration author.
+
+\section{Find the most suitable workaround for every sink found}
+
+TODO: write me
+
+\section{Implementing the integration and releasing a new version of the target}
+
+Implementing the integration and releasing a new version of the target is undoubtedly an important part
 of Trusted Types integration. However, this can take long time for multiple reasons, which are
 described in separate sections:
 
 \begin{enumerate}
-  \item Reasoning about the integration, section \ref{sub:reason_about_integration}
-  \item Trusted Types compatibility in dependencies, section \ref{sub:tt_compatibility_in_deps}
-  \item Knowledge of the integration author, section \ref{sub:trust_integration_author}
+  \item Reasoning about the integration
+  \item Trusted Types compatibility in dependencies
+  \item Knowledge required for the integration author
 \end{enumerate}
 
 \subsection{Reasoning about the integration}
 \label{sub:reason_about_integration}
 
-Proving that the integration is correct is often hard or impossible. However, proving implementation
-correctness in general is often impossible, so this is not that big of an issue. One can look at the
-integration empirically instead - if the integration is tested on multiple projects and they all
-seem to work it is safer to assume that the integration is correct. This is especially true when the
-integration is tested by large scale organizations on lot of their services.
+Proving that the integration is correct means to determine if all sinks have been located and
+properly addressed. This is generally infeasible or impossible to determine. Project usually look at
+patches empirically. If the integration looks correct and is properly tested then it is safe to
+assume that the integration is correct. This is especially true when the integration is tested by
+large scale organizations by lot of services.
 
-That being said, Trusted Types integration is a breaking change and targets should make this change
+That being said, Trusted Types enforcement is a breaking change and project should make this change
 opt-in or release a new version with breaking changes \cite{dom_purify_major_version}. If the
 integration is turned on by default when Trusted Types are available in the browser, the target is
 risking breaking existing applications \cite{dom_purify_breakage}.
@@ -115,62 +118,33 @@ in the integration being put behind a feature flag which hurts the adoption
 \subsection{Trusted Types compatibility in dependencies}
 \label{sub:tt_compatibility_in_deps}
 
-Implementing the integration in large targets, which consists of many dependencies can bring a lot
+Implementing the integration in large projects, which consists of many dependencies can bring a lot
 of overhead, because to be fully Trusted Types compliant one must ensure that all of the
 dependencies are Trusted Types complaint as well.
 
 When there is non compliant dependency, one has multiple options:
 
 \begin{itemize}
-  \item Implement the integration for the dependency - This option has all the problems already
-        mentioned and can possible lead to even more integrations.
+  \item Implement the integration for the dependency - This option leads to recursive integrations
+        and has all the problems already mentioned and can possible lead to many more integrations.
   \item Find an alternative dependency - This option is often impossible as a viable alternative
-        might not exist.
-  \item Use Trusted Types default policy - This option is applicable only for applications, is more
-        complex and the application is not fully Trusted Types compliant.
+        might not exist and projects might not want to use an alternative only because of Trusted
+        Types compliance.
+  \item Use Trusted Types default policy - This option should only be used by end applications and
+        is more complex. The application is not fully Trusted Types compliant and it can also lead
+        to a reduced performance.
 \end{itemize}
 
-\subsection{Knowledge of the integration author}
+\subsection{Knowledge required for the integration author}
 \label{sub:trust_integration_author}
 
-It is likely that the integration author is either a security engineer familiar with Trusted Types
-or a part of the engineering team of the target familiar with the target code. This means that the
-author might not be fully familiar with both of the technologies, which results in both:
+The integration author can neither be a security engineer familiar with Trusted Types and neither a
+part of the engineering team of the target familiar with the target code. This means that the author
+might not be fully familiar with both of the technologies and the respective teams, which can result
+in both:
 
 \begin{itemize}
   \item Increased propability of a bug in implementation
-  \item Harder and longer review, since the reviewers are likely in a similar position
+  \item Harder and longer review, since the reviewers might also lack the information about Trusted
+        Types or simply ignore the PR due to other priorities
 \end{itemize}
-
-\section{Recommended setup for libraries and frameworks}
-\label{recommended_setup_for_libraries}
-
-The following section describes the recommended setup on how to prepare for the implementation of
-the integration based on our experience. We also assume, the target code is put under version
-control, such as \textit{git}.
-
-This section should give the reader a high level overview of how the integration setup is performed,
-not a definitive guide. We also use this section as a guideline when implementing the integrations.
-The general structure is very simple:
-
-\begin{enumerate}
-  \item Clone the repository of the library locally
-  \item Create an application which uses your local version as a dependency
-\end{enumerate}
-
-\subsection{Clone the repository of the library locally}
-
-Having the repository cloned locally has an advantage that you can keep your integration up to date
-with the latest changes. It is also probably required to submit the integration once implemented.
-
-\subsection{Create an application which uses your local version as a dependency}
-
-This is the more interesting part, but it is also very project specific. For web development, the
-dependencies are usually managed with package managers such as \textit{npm} or \textit{yarn}. Both
-of these allow you to configure local dependencies. The only thing that the integration author needs
-to do is to be able to build the target as a dependency for the application.
-
-Afterwards, one can implement the integration and verify assumptions on the application
-simultaneously, which can greatly speed up the integration. Also, after the integration is
-implemented, one can have a present the application code as an empiric proof of the integration
-correctness.

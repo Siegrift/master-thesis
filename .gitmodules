@@ -19,3 +19,6 @@
 [submodule "code/cypress-documentation"]
 	path = code/cypress-documentation
 	url = git@github.com:Siegrift/cypress-documentation.git
+[submodule "code/trusted-types"]
+	path = code/trusted-types
+	url = git@github.com:Siegrift/trusted-types.git

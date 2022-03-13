@@ -10,9 +10,13 @@
         source is the location from which untrusted data is taken by the application (which can be
         controlled by user input) and passed on to the sink (e.g. location, cookies). Sinks are the
         places where untrusted data coming from the sources is actually getting executed resulting
-        in DOM XSS (e.g. eval, element.innerHTML) \cite{source_sink_definition}.
-  \item \label{def:hot_reload} \textbf{Hot reload} - Hot reload just displays the code changes
-        according to new code changes without restarting the app.
+        in DOM XSS (e.g. eval, element.innerHTML) \cite{source_sink_definition}. We might also refer
+        to sink as injection sink, because the untrusted value is injected into the sink by the
+        attacked.
+  \item \label{def:hot_reload} \textbf{Hot reload} - The concept of live or hot reloading is that
+        the running application running in development mode is automatically restarted after code
+        changes are made. The former restarts the whole app, the latter only patches the running
+        application with code changed and preserves the application state.
   \item \label{def:dom_xss} \textbf{DOM XSS} - DOM Based XSS is an XSS attack wherein the attack
         payload is executed as a result of modifying the DOM environment in the victim's browser
         used by the original client side script, so that the client side code runs in an

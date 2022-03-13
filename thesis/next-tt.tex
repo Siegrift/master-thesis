@@ -1,20 +1,52 @@
 \chapter{Trusted Types integration into Next.js}
 
 Next.js (described in \ref{intro-nextjs}) was the initial choice for Trusted Types integration,
-because of a large impact this would have and also because the framework seemed interested and open
-to the integration of Trusted Types for a longer time \cite{nextjs_tt_pr_2020}.
+because of the large impact this integration would have. The framework itself seemed interested in
+the integration of Trusted Types for a longer time \cite{nextjs_tt_pr_2020}.
 
-The integration setup followed chapter \ref{tt_integration_setup}. There were changes needed in both
-the application and Next.js code and we ended up with a working version of a blank application
-running in dev mode with Trusted Types aware Next.js as a dependency. However, we decided not to
-pursue this project no more and shifted focus to a different target.
+We forked the Next.js repository and created a basic Next.js application. We then used the local
+version of Next.js as a dependency for our application. The integration required a few code changes
+in the implementation of Next.js and we ended up with a working version which supported the
+application in dev mode with Trusted Types under enforcement mode. We managed to accomplish this
+with one simply Trusted Types policy in a couple of days.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Example of Next.js Trusted Types API]
+let policy
+
+const whitelistAll = (str) => str;
+
+// The policy getter is a private part of the module
+// and cannot be used directly.
+const getOrCreatePolicy = () => {
+  if (policy) return policy
+
+  policy = window.trustedTypes?.createPolicy('next', {
+    createHTML: whitelistAll('createHTML'),
+    createScript: whitelistAll('createScript'),
+    createScriptURL: whitelistAll('createScriptURL'),
+  })
+  return policy
+}
+
+export const __unsafeAllowHtml = (html) => getOrCreatePolicy()?.createHTML(html) ?? html
+
+export const __unsafeAllowScriptUrl = (scriptUrl) => getOrCreatePolicy()?.createScriptURL(scriptUrl) ?? scriptUrl
+
+export const __unsafeAllowScript = (script) => getOrCreatePolicy()?.createScript(script) ?? script
+\end{lstlisting}
+
+The fixes needed were small the Trusted Types API specific for Next.js was encapsulated in a single
+small module. That said, the implementation was only a proof of concept and the policy implemented
+might have allowed more then necessary. However, we decided not to pursue this project no more due
+to different priorities and shifted focus to a different project.
 
 \section{Fixing violations reported by Tsec}
 
 Tsec found 8 violations \cite{tsec_output} inside Next.js sources. Out of these 7 were indeed
 Trusted Types violations that needed to be fixed. Some of these could be fixed simply on a type
 system level since they expected a value from the user. The others needed to be allowed explicitely
-by using a policy. The implementation for this can be found on github
+by using a policy. The implementation for this proof of concept can be found on github
 \cite{nextjs_fix_tsec_violations_commit}.
 
 Since our utmost goal was to find the sinks and create a prototype for the integration we wrapped
@@ -22,14 +54,12 @@ all of these values in Trusted Types objects. This was to be revisited in the fu
 
 \section{Fixing the dev mode of an example application}
 
-% TODO: Mention configuration in webpack 5
-
 Fixing the violations found by Tsec was not enough and the application still wouldn't launch with
 Trusted Types enforced. The reason for this hasn't been clear, but it was probably a webpack plugin
 used in one of the Next.js dependencies. The violating code relied on eval, which threw an error
 when Trusted Types were enforced. The workaround for this was to use a default policy and allow all
 eval calls.
 
-Apart from this, there was another violation that was triggered when the application wanted to hot
-reload (\ref{def:hot_reload}). Tsec wasn't able to catch this, since the violation came from a
-JavaScript file where the AST information was limited.
+Apart from this, there was another violation that was triggered caused by application hot reloading
+(\ref{def:hot_reload}). Tsec wasn't able to catch this, since the violation came from a JavaScript
+file where the AST information was limited.

@@ -5,12 +5,14 @@
 Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
 of web applications taking untrusted user input and interpreting is as code without sanitization or
 escaping. The XSS has many subcategories, for this paper the most important is DOM XSS
-(\ref{def:dom_xss}), where the injection happens on the client side \cite{tt_web_framework_paper}.
+(\ref{def:dom_xss}), where the injection happens on the client side, the browser
+\cite{tt_web_framework_paper}.
 
 This vulnerability became more widespread with the boom of single page applications where most of
-the application behaviour is achieved by modifying the DOM using JavaScript. There are many
-functions in the DOM API which interpret the arguments as executable code thus making it easy for
-developers to accidentally introduce this vulnerability \cite{tt_web_framework_paper}.
+the behaviour is achieved by modifying the DOM using JavaScript. There are many functions, element
+attributes and properties in the DOM API which interpret the arguments as executable code. We call
+these DOM sinks (\ref{def:dom_source_sink}). These sinks make it easy for developers to accidentally
+introduce this vulnerability \cite{tt_web_framework_paper}.
 
 There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
 former usually suffer from performance and scalability issues when applied on large codebases while
@@ -23,7 +25,6 @@ document.write()
 document.writeln()
 document.domain
 element.innerHTML
-element.outerHTML
 element.insertAdjacentHTML
 element.onevent
 DomParser.parseFromString
@@ -45,46 +46,49 @@ that does not change application behavior and an enforcement mode that may cause
 breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
-called with values that have not passed through a Trusted Types policy \cite{tt_background}.
+called with values that have not passed through a Trusted Types policy \cite{tt_background}. If an
+untrusted value is passed to sink a Trusted Types violation is raised and the DOM is unaffected. In
+practice this means that a potential DOM XSS has been prevented.
 
 There are many other resources which can be used to explore Trusted Types in depth
 \cite{tt_resources}.
 
 \subsection{Threat model}
 
-Trusted Types is a powerful API with a well scoped threat model. The main goals of the API are
+Trusted Types is a powerful API with a well scoped threat model. The main goals of the API are to
 \cite{tt_spec:goals}:
 
 \begin{itemize}
-  \item Reduce the risk of client side vulnerabilities caused by powerful and insecure by default
-        DOM APIs
-  \item Replace the insecure by default APIs with safer alternatives which are hard to misuse
-  \item Encourage a design where the code affecting the application security is encapsulated in a
-        small part of an application
-  \item Reduces the security review surface for applications and libraries
+  \item reduce the risk of client side vulnerabilities caused by injection sinks.
+  \item replace the insecure by default APIs with safer alternatives which are hard to misuse.
+  \item encourage a design where the code affecting the application security is encapsulated in a
+        small part of an application.
+  \item reduce the security review surface for applications and libraries.
 \end{itemize}
 
 The main idea behind Trusted Types is to replace the dangerous APIs with safer alternatives. It is
 very tempting to extend the threat model of Trusted types to cover other surfaces such as various
 server side attacks. However, this is a very complex area and it is part of the non goals of Trusted
-Types \cite{tt_spec:non_goals}:
+Types \cite{tt_spec:non_goals}. Some of the non goals include:
 
 \begin{itemize}
-  \item Prevent or mitigate server side generated markup attacks. To address these solutions, use
-        the existing recommended solutions like templating systems or CSP script-src
-  \item Control subresource loading. Trusted Types deal with code running in realm of the current
-        document and does not guard subresources
-  \item Guard cross origin JavaScript execution, for example loading new documents via data: URLs
-  \item Protect against malicious developers of the web application
+  \item preventing or mitigating server side generated markup attacks. Defending against XSS on both
+        client and server can be really complex, especially for applications where parts of the code
+        can run on both client and server, such as NextJS (\ref{intro-nextjs}). To address these
+        attacks, use the existing recommended solutions like templating systems or CSP script-src.
+  \item controling subresource loading. Trusted Types deal with code running in realm of the current
+        document and does not guard subresources.
+  \item guarding cross origin JavaScript execution, for example loading new documents via data: URLs
+  \item protecting against malicious developers of the web application.
 \end{itemize}
 
 \subsection{Content Security Policy (CSP)}
 \label{csp}
 
-Trusted Types are enabled through a CSP (\ref{def:csp}) using two directives:
+Trusted Types are enabled through a CSP (\ref{def:csp}) using two different directives:
 
 \begin{itemize}
-  \item \textit{require-trusted-types-for} - This directive instructs user agents to control the
+  \item \textit{require-trusted-types-for} -- This directive instructs user agents to control the
         data passed to DOM XSS sink functions (\cite{mdn:require-trusted-types-for}).
 
         \bigskip
@@ -92,7 +96,7 @@ Trusted Types are enabled through a CSP (\ref{def:csp}) using two directives:
         \begin{lstlisting}[language={}, caption=Syntax of require-trusted-types-for directive]
 Content-Security-Policy: require-trusted-types-for 'script';\end{lstlisting}
 
-  \item \textit{trusted-types} - This directive instructs user agents to restrict the creation of
+  \item \textit{trusted-types} -- This directive instructs user agents to restrict the creation of
         Trusted Types policies (\cite{mdn:trusted-types}). Syntax:
 
         \bigskip
@@ -105,18 +109,20 @@ Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicat
 \end{itemize}
 
 These directives together enable and configure Trusted Types behaviour for the particular web page.
-They allow the application authors to define rules guarding writing values to the DOM sinks and thus
+They allow the application authors to define rules guarding write access to the DOM sinks and thus
 reducing the DOM XSS attack surface to small, isolated parts of the web application codebase,
-facilitating their monitoring and code review.
+facilitating their monitoring and manual code review.
 
 Apart from the standard \textit{Content-Security-Policy} header there is also
-\textit{Content-Security-Policy-Report-Only} which you can use to enable Trusted Types in report
-only mode. This way the application can gradually work on Trusted Types compliance without breaking
-the existing application.
+\textit{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in report
+only mode. This mode interprets Trusted Types violations only as warnings. This way the application
+can gradually work on Trusted Types compliance without breaking the existing application. It is also
+recommended to use the report only mode in production for some time to make sure the integration is
+working as expected \cite{tt_web_framework_paper}.
 
-Once the Trusted Types are enabled with the regular or the report only CSP, the browser changes the
-behaviour of insecure DOM API sinks and expects "trusted" values instead of regular strings. These
-trusted values are created via Trusted Types policies.
+Once the Trusted Types are enabled, the browser changes the behaviour of insecure DOM API sinks and
+expects "trusted" values instead of regular strings. These trusted values are created via Trusted
+Types policies.
 
 \subsection{Trusted Types policies}
 \label{subsec:tt_policy}
@@ -124,7 +130,7 @@ trusted values are created via Trusted Types policies.
 The core part of Trusted Types API are policies which are factory functions for creating "trusted"
 values which can be assigned to DOM sinks when Trusted Types are enabled. The policies are created
 by the application and access to them should be restricted. In javascript this can be easily
-achieved by creating a policy in it own module and exporting only a very specific functions which
+achieved by creating a policy in its own module and exporting only a very specific functions which
 use this policy internally.
 
 \bigskip
@@ -149,27 +155,28 @@ The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using
 functions. This callback function is called when the policy is used to create a trusted value. It
 receives the sink value of string type as an argument and has to return a string value that is XSS
 free and thus can be trusted. In practice, this function may be implemented as identity if the
-payload is known to be safe. Another good example would be to sanitize the sink value inside this
-callback. In case the payload should not be used, you can return null or undefined which will
-trigger a Trusted Types violation. The callback function should never throw.
+payload is trusted. Another good example would be to sanitize the sink value inside this callback.
+In case the payload should not be used, you can return \textit{null} or \textit{undefined} which
+will trigger a Trusted Types violation.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
 const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
-  createHTML: (unsafeValue) => DOMPurify.sanitize(unsafeValue),
+  createHTML: (untrustedValue) => DOMPurify.sanitize(untrustedValue),
 });
 \end{lstlisting}
 
 \subsection{Default policy}
 
-% TODO: This is inconsistent in the spec
-There is one special case for Trusted Types policies. Application may use create a policy called
-"default". This policy has special behaviour. When a string value is passed to a DOM sink when
-Trusted Types are enforced, the user agent will implicitely call pass the unsafe value through the
-default policy with the string payload, sink type and sink name respectively instead of triggering a
-Trusted Types violation immediately. This allows the application to recover from an unexpected sink
-usage, for example by sanitizing the unsafe value. If the default policy does not exist or returns
-null or undefined a CSP violation will be triggered \cite{tt_spec:default_policy}.
+There is one special case for Trusted Types policies. Applications may create a policy called
+"default". This policy has a special behaviour. When a string value is passed to a DOM sink when
+Trusted Types are enforced, the user agent will implicitely flow the untrusted string value through
+the default policy. The callback function of the default policy receives three arguments, the string
+payload, sink type and sink name respectively. This allows the application to recover from an
+unexpected sink usage, for example by sanitizing the untrusted value. If the default policy does not
+exist or returns \textit{null} or \textit{undefined} a CSP violation will be triggered
+\cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode even
+though the application is not fully Trusted Types complaint.
 
 This feature is intended to be used by applications with legacy code that uses injection sinks. The
 callback functions of the policy should be defined with very strict rules to prevent bypassing
@@ -193,14 +200,13 @@ trustedTypes.createPolicy('default', {
 
 \subsection{Reviewability}
 
-Consider the problem of security reviews of web applications. There are many tools and methodologies
+Consider the problem of security reviews for web applications. There are many tools and methodologies
 which can help reason about the application security, but there is no automated way that can assert
 the application safety. This means that it is still necessary for security engeneers to manually
-review the implementation and look for potential vulnerabilities and analyze them. Depending on the
-implementation this may be easy or it can be difficult process.
+review the implementation and look for potential vulnerabilities and analyze them.
 
-When focusing on client side XSS safety, the engineer has assess whether application uses dangerous
-DOM sinks and whether there is way for attacker to misuse this.
+When focusing on client side XSS, the engineer has to determine whether application uses dangerous
+DOM sinks and whether there is way for attacker to misuse them.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Possibly dangerous function]
@@ -210,8 +216,9 @@ function setHtml(element, html) {
 \end{lstlisting}
 
 Is the function in the listing above safe? There is not enough information to answer this. The
-safety of this function depends on how it is used. More generally, the safety of this function
-depends on it direct and indirect callers, both present and future ones \cite{tt_design_history}.
+safety of this function depends on the context and how it is used. More generally, the safety of
+this function depends on both its direct and indirect callers, both present and future ones
+\cite{tt_design_history}.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Usage of the possibly dangerous function, label={lst:dangerous_fn_usage}]
@@ -227,7 +234,7 @@ depends on it direct and indirect callers, both present and future ones \cite{tt
   }
 \end{lstlisting}
 
-Looking for the callers of the function is difficult because of the dynamic nature and of
+Looking for the callers of the function can be difficult because of the dynamic nature of
 JavaScript. Also, JavaScript is a mutable language which makes it harder to reason about function
 calls, especially the third party ones.
 
@@ -235,15 +242,12 @@ When the application enforces Trusted Types, the engineer doesn't have to care a
 functions and its callers. The focus of the security review shifts to reasoning about the creation
 of trusted values and policies. Once a trusted value is created it is immutable and the policy which
 created it is guarantees the security. When a trusted value reaches a sink, this guarantee still
-holds independently of how the value passed around in the future callers. Consider the third party
-call in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains a
+holds independently of how was the value passed around throughout the callers. Consider the third
+party call in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains a
 TrustedHTML value. If the third party call modified this value a violation would be thrown when
 passed to the DOM sink. It could also replace the trusted value with a different TrustedHTML value.
 However, the new value is again trusted, so this is not a security vulnerability, but an application
-feature.
-
-This design reduces the code surface of application during security reviews and makes it easier to
-reason about the application security.
+bug.
 
 \subsection{Browser support and polyfill}
 
@@ -255,73 +259,79 @@ faster experience for the end users. This brings additional complexity and new a
 forms of reflected XSS, various kinds of injection and more, which are out of the threat model under
 which Trusted Types operate.
 
-The good thing about Trusted Types is that once the application is Trusted Types compliant then all
-of the application sinks are protected. The author of the application has to rewrite the application
-code to use Trusted Types. If the application uses polyfill for browsers which do not support
-Trusted Types, it results in the same security properties as in browsers where Trusted Types are
+The nice thing is that once the application is Trusted Types compliant then all of the application
+sinks are protected. The application can also use a polyfill for browsers which do not support
+Trusted Types, which results in the same security properties as in the browsers where they are
 supported \cite{xss_nowhere_with_polyfill}.
 
 Browsers which do not support Trusted Types yet can use one of the variants of the polyfill:
 
 \begin{itemize}
-  \item Full - Defined the Trusted Types API, parses the \textit{meta} tag from the HTML and enables
-        the enforcement in the DOM
-  \item API only - Defines the Trusted Types API so you can use policies and create trusted values
-  \item Tiny - Polyfills only the most important part of the API surface with a single line of code
+  \item Full -- Defines the Trusted Types API, parses the \textit{meta} tag from the HTML and
+        enables the enforcement in the DOM.
+  \item API only -- Defines the Trusted Types API so you can use policies and create trusted values,
+        but no enforcement rules are applied.
+  \item Tiny -- Polyfills only the most important part of the API surface with a single line of
+        code for minimal bundle size.
 \end{itemize}
 
 \section{Web frameworks and libraries}
 
 Web frameworks and libraries is a software that is designed to support development of web
-applications and services related to web applications. Frameworks try to solve common problems faced
-in web development, such as building and reusing user interfaces, managing state, performing API
-requests and enforcing the best security practices.
+applications and services to improve developer experience. They try to solve common problems faced
+in web development, such as building user interfaces, testing, building and bundling the
+application. Typical web application consists of numerous libraries and supporting frameworks which
+together create the resulting web application.
 
 \subsection{Next.js}
 \label{intro-nextjs}
 
 Next.js is one of the most popular frameworks for building web applications. The framework is build
-upon React library which is the most used library as of 2021 \cite{react_most_used_2021}. There are
-many reasons for why Next.js is among the most popular frameworks. Notably, it is opinionated about
-how the application backend should work. This design choice allows Next.js to decide the best
-possible way to build a particular web page. The important fact to take away is that Next.js is not
-only about the client side (the DOM), but it can also handle server side rendering, data processing,
-API requests which open up different means of attacks such as reflected XSS, SQL injections and
-more.
-
-Next.js is a complex framework when looking at the source code. As of Oct 6, 2021 it consists of
-more then 200,000 lines of code. Looking at each file or have a complete understanding of the
-entire codebase is impossible for external contributor.
+upon React which is the most used library as of 2021 \cite{react_most_used_2021}. The design of
+Next.js allows building the application on a page by page basic to maximize the user experience.
+Some parts of the application can be statically rendered, some rendered server side or fully client
+side. Next.js is thus not only about the client side (the DOM), but it can also handle server side
+rendering, data processing, API requests which open up different means of attacks such as reflected
+XSS, SQL injections and more.
 
 \subsection{Create React App}
 \label{intro-cra}
 
 Create React App is an officially supported way to create single-page React applications. It offers
-a modern build setup with no configuration. It is a CLI which creates and configures minimal React
+a modern build setup with no configuration. It is a CLI which creates and configures a minimal React
 application. This is ideal for starting new projects as the configuration is abstracted away from
 the user.
 
-The source code of this tool is not dependant on React directly. It only focuses on generating the
-project files from the template and then it installs React and other necessary dependencies.
+The source code of this tool does not depend on React directly. It only generates the project files
+using based on hard coded template and then it installs the latest version of React and other
+necessary dependencies.
 
-\subsection{Motivation and background}
+\subsection{Cypress}
+\label{intro:cypress}
+
+Cypress is one of the most popular frameworks for end to end testing of web applications
+\cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
+tests in real browsers and is fast and reliable due to its unique architecture. Developers can test
+the Trusted Types compliant applications in Cypress out of the box, because most of the Cypress
+commands only query the DOM which does not produce Trusted Types violations.
+
+\section{Motivation and background}
 
 Trusted Types provide opportunity to significantly reduce the risk of client side XSS and has been
 proven in various scale projects and libraries \cite{tt_web_framework_paper}
-\cite{tt_integration_list}. However, for projects need to refactor parts of their code, which can be
+\cite{tt_integration_list}. However, projects need to refactor parts of their code, which can be
 difficult, especially in the open source world where the software is composed by multiple
 dependencies which can't easily be modified. This presents a large barrier in Trusted Types adoption
 \cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough pressure for
 library authors to migrate to Trusted Types and lot of applications are prevented to migrate because
 their dependencies do not work with Trusted Types.
 
-In our work we try to analyze some of the most popular open source frameworks and libraries and show
-that there are workarounds for applications to use Trusted Types without too much hassle. We also
-stress the need for more tooling and libraries for Trusted Types support, where we see a big
-opportunity for open source contributors to help.
+In this paper we try to analyze some of the most popular open source frameworks and libraries and
+show that there are workarounds for projects to use Trusted Types without too much hassle. We
+also stress the need for more tooling and libraries with Trusted Types support, where we see a big
+opportunity for open source contributors to engage.
 
-Our position targets the sweet spot between understanding the client side vulnerabilities and
-writing software. There is usually a knowledge gap between security engineers and software
-developers, the former focus on security, the latter on the application features. Trusted Types
-bridge this gap by providing secure by default software and the ideal scenario would be if open
-source libraries used Trusted Types transparently to the application authors.
+There is usually a knowledge gap between security engineers and software developers, the former
+focus on security, the latter on the application features. Trusted Types bridge this gap by
+providing secure by default software. The ideal scenario is if the open source libraries used
+Trusted Types transparently to the application authors.
