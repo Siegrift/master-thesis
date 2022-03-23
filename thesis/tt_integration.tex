@@ -1,13 +1,13 @@
 \chapter{Trusted Types integration}
 \label{tt_integration_setup}
 
-Integrating Trusted Types to target applications and libraries is a might seem as complex task that
+Integrating Trusted Types to target applications and libraries might seem as a complex task that
 requires good knowledge of the target inner workings. There is a small sample of already implemented
-integrations, which show that the necessary code changes are relatively small
+integrations, which shows that the necessary code changes are relatively small
 \cite{tt_integration_list}. Based on our experience, the integration does not require an exprteese
-of the projects inner workings. This experience is also supported by other integration authors
-\cite{tt_web_framework_paper}. Each integration is different, but on a high level they follow the
-same steps:
+of the projects inner workings neither. This experience is also supported by other integration
+authors \cite{tt_web_framework_paper}. Each integration is different, but on a high level they
+follow the same steps:
 
 \begin{enumerate}
   \item Locate all of the DOM sinks
@@ -32,11 +32,11 @@ Fortunately, there are a few methods and tools, which can help to catch most of 
 
 \subsection{Static search through the codebase}
 
-This method is the simplest one and arguably the least effective. Statically searching for sinks
-throughout the codebase produces many false positives and false negatives. The former are produced
-for read only sink usage, the latter when actual sinks are missed due to implementation limitations.
-The output of the static search is usually cluttered with less important violations in tests and
-built tools, which you need to manually exclude from the search.
+This method is the simplest one and the least effective. Statically searching for sinks throughout
+the codebase produces many false positives and also false negatives. The former are produced for
+read only sink usage, the latter when actual sinks are missed due to implementation limitations. The
+output of the static search is usually cluttered with less important violations in tests and built
+tools, which you need to manually exclude from the search.
 
 Nevertheless, this method is easy to reason about, fast to iterate and the final search results can
 provide a good estimate of the integration scope. This works well in practice since there is an
@@ -59,14 +59,15 @@ produces less false positives.
 These tools have an advantage that they can be used to maintain the Trusted Types compatibility even
 after the violations are fixed. For example, they can be run in CI pipeline or their output can be
 leveraged by linters and other language plugin tools and the errors can be shown to the developers
-directly in their IDE \cite{tsec_lsp}.
+early on and directly in their IDE \cite{tsec_lsp}.
 
 \subsection{Using the target in a real world application}
 
 While static search through the codebase is fast and locates most of the sinks, it usually doesn't
-catch them all. The author of the integration should verify the integration on the applications
-using the target as a dependency. Also, having good test coverage in the application code greatly
-increases the chance that the integration is implemented correctly.
+catch them all. If the integration target is a library, the integration author should verify the
+integration implementation on the applications using the target as a dependency. Also, having good
+test coverage in the target code greatly increases the chance that the integration is
+implemented correctly.
 
 That said, finding a suitable application might be challenging and it may not be an ideal way to
 test all edge cases. For example, when implementing an integration to React, one can find lot of
@@ -103,8 +104,8 @@ described in separate sections:
 Proving that the integration is correct means to determine if all sinks have been located and
 properly addressed. This is generally infeasible or impossible to determine. Project usually look at
 patches empirically. If the integration looks correct and is properly tested then it is safe to
-assume that the integration is correct. This is especially true when the integration is tested by
-large scale organizations by lot of services.
+assume that the integration is indeed correct. This is especially true when the integration is
+tested by large scale organizations by lot of services.
 
 That being said, Trusted Types enforcement is a breaking change and project should make this change
 opt-in or release a new version with breaking changes \cite{dom_purify_major_version}. If the

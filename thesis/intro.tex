@@ -42,7 +42,7 @@ mitigating XSS \cite{tt_design_history}.
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
 XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
 directly in the web browser. They are delivered through a CSP header and have a report-only mode
-that does not change application behavior and an enforcement mode that may cause user-observable
+that does not change the application behavior and an enforcement mode that may cause user-observable
 breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
@@ -50,7 +50,7 @@ called with values that have not passed through a Trusted Types policy \cite{tt_
 untrusted value is passed to sink a Trusted Types violation is raised and the DOM is unaffected. In
 practice this means that a potential DOM XSS has been prevented.
 
-There are many other resources which can be used to explore Trusted Types in depth
+There are many other resources which can be used to explore Trusted Types in detail
 \cite{tt_resources}.
 
 \subsection{Threat model}
@@ -60,7 +60,7 @@ Trusted Types is a powerful API with a well scoped threat model. The main goals 
 
 \begin{itemize}
   \item reduce the risk of client side vulnerabilities caused by injection sinks.
-  \item replace the insecure by default APIs with safer alternatives which are hard to misuse.
+  \item replace the insecure by default APIs with safer alternatives which are harder to misuse.
   \item encourage a design where the code affecting the application security is encapsulated in a
         small part of an application.
   \item reduce the security review surface for applications and libraries.
@@ -108,17 +108,17 @@ Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicat
 
 \end{itemize}
 
-These directives together enable and configure Trusted Types behaviour for the particular web page.
-They allow the application authors to define rules guarding write access to the DOM sinks and thus
-reducing the DOM XSS attack surface to small, isolated parts of the web application codebase,
-facilitating their monitoring and manual code review.
+These directives together enable and configure Trusted Types behaviour for the particular web
+application. They allow the application authors to define rules guarding write access to the DOM
+sinks and thus reducing the DOM XSS attack surface to small, isolated parts of the web application
+codebase, facilitating their monitoring and manual code review.
 
 Apart from the standard \textit{Content-Security-Policy} header there is also
 \textit{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in report
 only mode. This mode interprets Trusted Types violations only as warnings. This way the application
-can gradually work on Trusted Types compliance without breaking the existing application. It is also
-recommended to use the report only mode in production for some time to make sure the integration is
-working as expected \cite{tt_web_framework_paper}.
+can gradually work on Trusted Types compliance without breaking the existing application features.
+It is also recommended to use the report only mode in production for some time to make sure the
+integration is working as expected \cite{tt_web_framework_paper}.
 
 Once the Trusted Types are enabled, the browser changes the behaviour of insecure DOM API sinks and
 expects "trusted" values instead of regular strings. These trusted values are created via Trusted
@@ -155,9 +155,9 @@ The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using
 functions. This callback function is called when the policy is used to create a trusted value. It
 receives the sink value of string type as an argument and has to return a string value that is XSS
 free and thus can be trusted. In practice, this function may be implemented as identity if the
-payload is trusted. Another good example would be to sanitize the sink value inside this callback.
-In case the payload should not be used, you can return \textit{null} or \textit{undefined} which
-will trigger a Trusted Types violation.
+payload is already trusted. Another good example would be to sanitize the sink value inside this
+callback. In case the payload should not be used, you can return \textit{null} or \textit{undefined}
+which will trigger a Trusted Types violation.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
@@ -170,13 +170,13 @@ const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
 
 There is one special case for Trusted Types policies. Applications may create a policy called
 "default". This policy has a special behaviour. When a string value is passed to a DOM sink when
-Trusted Types are enforced, the user agent will implicitely flow the untrusted string value through
-the default policy. The callback function of the default policy receives three arguments, the string
-payload, sink type and sink name respectively. This allows the application to recover from an
-unexpected sink usage, for example by sanitizing the untrusted value. If the default policy does not
-exist or returns \textit{null} or \textit{undefined} a CSP violation will be triggered
-\cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode even
-though the application is not fully Trusted Types complaint.
+Trusted Types are enabled, the user agent will implicitely flow the untrusted string value through
+the default policy. The callback function of the default policy receives three arguments instead of
+one -- the string payload, sink type and sink name respectively. This allows the application to
+recover from an unexpected sink usage, for example by sanitizing the untrusted value. If the default
+policy does not exist or returns \textit{null} or \textit{undefined} a CSP violation will be
+triggered \cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode
+even though the application is not fully Trusted Types complaint.
 
 This feature is intended to be used by applications with legacy code that uses injection sinks. The
 callback functions of the policy should be defined with very strict rules to prevent bypassing
@@ -216,8 +216,8 @@ function setHtml(element, html) {
 \end{lstlisting}
 
 Is the function in the listing above safe? There is not enough information to answer this. The
-safety of this function depends on the context and how it is used. More generally, the safety of
-this function depends on both its direct and indirect callers, both present and future ones
+safety of the function depends on the context and how it is used. More generally, the safety of a
+function depends on both its direct and indirect callers, both present and future ones
 \cite{tt_design_history}.
 
 \bigskip
@@ -241,10 +241,10 @@ calls, especially the third party ones.
 When the application enforces Trusted Types, the engineer doesn't have to care about the dangerous
 functions and its callers. The focus of the security review shifts to reasoning about the creation
 of trusted values and policies. Once a trusted value is created it is immutable and the policy which
-created it is guarantees the security. When a trusted value reaches a sink, this guarantee still
-holds independently of how was the value passed around throughout the callers. Consider the third
-party call in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains a
-TrustedHTML value. If the third party call modified this value a violation would be thrown when
+created it provides the security guarantees. When a trusted value reaches a sink, this guarantee
+still holds independently of how was the value passed around throughout the callers. Consider the
+third party call in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains
+a TrustedHTML value. If the third party call modified this value a violation would be thrown when
 passed to the DOM sink. It could also replace the trusted value with a different TrustedHTML value.
 However, the new value is again trusted, so this is not a security vulnerability, but an application
 bug.
@@ -323,8 +323,9 @@ proven in various scale projects and libraries \cite{tt_web_framework_paper}
 difficult, especially in the open source world where the software is composed by multiple
 dependencies which can't easily be modified. This presents a large barrier in Trusted Types adoption
 \cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough pressure for
-library authors to migrate to Trusted Types and lot of applications are prevented to migrate because
-their dependencies do not work with Trusted Types.
+library authors to migrate to Trusted Types because there is not is not enough usage and there is
+not enough usage because a lot of applications are prevented to migrate because their dependencies
+do not work with Trusted Types.
 
 In this paper we try to analyze some of the most popular open source frameworks and libraries and
 show that there are workarounds for projects to use Trusted Types without too much hassle. We
@@ -333,5 +334,5 @@ opportunity for open source contributors to engage.
 
 There is usually a knowledge gap between security engineers and software developers, the former
 focus on security, the latter on the application features. Trusted Types bridge this gap by
-providing secure by default software. The ideal scenario is if the open source libraries used
+providing secure by default software. The ideal scenario would be if the open source libraries used
 Trusted Types transparently to the application authors.
