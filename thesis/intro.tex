@@ -1,5 +1,10 @@
 \chapter{Introduction}
 
+In this chapter we give a brief overview on one of the most common web application vulnerabilities
+(Cross site scripting) and then explain the design of Trusted Types and how it helps to mitigate
+this vulnerability. Lastly, we describe the frameworks and libraries we work with in the thesis and
+the motivation for our work.
+
 \section{Cross site scripting (XSS)}
 
 Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
@@ -13,11 +18,6 @@ the behaviour is achieved by modifying the DOM using JavaScript. There are many 
 attributes and properties in the DOM API which interpret the arguments as executable code. We call
 these DOM sinks (\ref{def:dom_source_sink}). These sinks make it easy for developers to accidentally
 introduce this vulnerability \cite{tt_web_framework_paper}.
-
-There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
-former usually suffer from performance and scalability issues when applied on large codebases while
-the latter provide suboptimal results due to JavaScript dynamic nature
-\cite{tt_web_framework_paper}.
 
 \bigskip
 \begin{lstlisting}[language={}, caption=Examples of DOM XSS attack vectors \cite{dom_xss_portswigger} \cite{tt_web_framework_paper}]
@@ -33,6 +33,39 @@ eval()
 script.src
 Worker()
 \end{lstlisting}
+
+One of the most basic examples of XSS is the interpolation of URL parameters in the DOM. The
+attacker can prepare a dangerous URL which he sends to a victim. The victim executes the payload
+just by navigating to the site sent by the attacker.
+
+\bigskip
+\begin{lstlisting}[language=HTML, caption=Basic example of XSS via unsafe URL parameter interpolation]
+<!--
+Assume this page is on https://example.com.
+It can be misused by the following attack payload:
+https://example.com?<img%20src=x%20onerror="alert(1)"></img>
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <div id="content"></div>
+    <script type="text/javascript">
+      const content = decodeURIComponent(location.search.substr(1))
+      document.getElementById('content').innerHTML = 'URL content: ' + content
+    </script>
+  </body>
+</html>
+\end{lstlisting}
+
+The consequences of XSS vary a lot. Their severity can range from benign annoyances to catastrophic
+user consequences such as full account compromise, disclosure of user's cookies, storage, secrets or
+session. Other attacks may use XSS to change the application content and present falsy information
+to the user.
+
+There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
+former usually suffer from performance and scalability issues when applied on large codebases while
+the latter provide suboptimal results due to JavaScript dynamic nature
+\cite{tt_web_framework_paper} \cite{owasp_xss_cheatsheet}.
 
 \section{Trusted Types}
 

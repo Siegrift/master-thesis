@@ -1,4 +1,4 @@
-\chapter{Trusted Types integration}
+\chapter{Trusted Types integration process}
 \label{tt_integration_setup}
 
 Integrating Trusted Types to target applications and libraries might seem as a complex task that
@@ -84,7 +84,51 @@ application from scratch by the integration author.
 
 \section{Find the most suitable workaround for every sink found}
 
-TODO: write me
+In this section, we assume that all of the sinks discussed produce Trusted Types violations. Note,
+that a sink can produce a Trusted Types violation be be provably safe. For example, this happens
+when a constant string is assigned to an innerHTML property of an DOM element.
+
+Generally, there are three ways how to resolve a Trusted Types violation produced by a sink:
+
+\begin{enumerate}
+  \item Refactor the code not to use the sink value
+  \item Wrap the value passed to the sink in a Trusted Types policy
+  \item Ensure Trusted value is not altered before reaching the sink
+\end{enumerate}
+
+\subsection{Refactor the code not to use the sink value}
+
+For some dangerous sinks, there is a safer alternative that can be used. For example, for non script
+elements, one can use `element.innerText` instead of `element.innerHTML`. Another way is to create
+DOM nodes manually and only append the generated elements to the target element as child.
+
+This method is only available when there is a safer API alternative, which is often not the case and
+this solution is not applicable.
+
+\subsection{Wrap the value passed to the sink in a Trusted Types policy}
+
+When there is no way to avoid using the sink and the value is trusted, one has to use a Trusted
+Types policy to promote the trusted value to a Trusted Types instance. One should apply the Trusted
+Types policy where the trusted value is created, not where it is passed to a sink. For example, the
+author should promote a value to Trusted Type immediately after sanitization or escaping. This way
+the immutability of Trusted Types can preserve the "trust" independently of how the value flows
+through code until it reaches the sink.
+
+The easy part of this method is creating a wrapping a value inside a policy, but if the application
+or library used to modify this value it now needs to be refactored to readonly usage of these values
+(\ref{tt_integration_ensure_tt_not_altered}).
+
+\label{tt_integration_ensure_tt_not_altered}
+\subsection{Ensure Trusted value is not altered before reaching the sink}
+
+As we mentioned, Trusted Types instances are immutable values. Previously the DOM sinks accepted a
+string values so the application or library might be used to call string operations on the value.
+Such code was valid, but now the Trusted Types values do not have string methods defined and trying
+to call them will result in an error. Another problem is stringification which converts the Trusted
+Types instance to a string, which then throws an error when the value is passed to the sink.
+
+The integration author needs to refactor the library or application to prevent modifying the
+Trusted values to preserve the trust guarantees secured by Trusted Types.
 
 \section{Implementing the integration and releasing a new version of the target}
 

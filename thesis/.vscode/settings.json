@@ -1,7 +1,5 @@
 {
   "editor.rulers": [100],
   "editor.wordWrapColumn": 100,
-  "cSpell.words": [
-    "Tsec"
-  ]
+  "cSpell.words": ["stringification", "Tsec"]
 }

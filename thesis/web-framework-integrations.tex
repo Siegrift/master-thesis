@@ -1,11 +1,16 @@
-\chapter{Trusted Types integration into Create React App}
+\chapter{Integrations into web frameworks and libraries}
+
+In this chapter we describe integrations to web applications and libraries we implemented. We
+document each unique properties of the integration, sinks found and the respective solutions.
+
+\section{Create React App integration}
 
 Create React App (CRA) (described in \ref{intro-cra}) was a second project we wanted to integrate
 Trusted Types to. After taking a look in the implementation of CRA we found that this tool does not
 depend on React directly, but only installs it after creating the project template. Our goal shifted
 to make sure the generated project by CRA is Trusted Types compatible.
 
-\section{Using Trusted Types compatible version of React}
+\subsection{Using Trusted Types compatible version of React}
 
 To accomplish this, we would need to change the implementation of CRA to install Trusted Types
 compatible version of React. Unfortunately, such version of React is implemented under a feature
@@ -19,7 +24,7 @@ Implementing this is non trivial, since it requires knowledge about React. More 
 this is harder to maintain for the application authors since you need to keep up with the new
 releases of React manually.
 
-\section{Using Trusted Types compliant version of Webpack}
+\subsection{Using Trusted Types compliant version of Webpack}
 
 CRA internally uses webpack version 5 to provide fast development experience with convenient
 features, such as hot reload. It also bundles the application for production and it handles
@@ -71,3 +76,69 @@ essentially unwraps all of the hidden configuration and creates these files in y
 then simply edit the webpack configuration which is now part of your project. This is not
 recommended and it should be used only when all other attempts fail. The generated webpack
 configuration is pretty complex and updating it in the future might not be trivial.
+
+\section{Next.js integration}
+
+Next.js (described in \ref{intro-nextjs}) was the initial choice for Trusted Types integration,
+because of the large impact this integration would have. The framework itself seemed interested in
+the integration of Trusted Types for a longer time \cite{nextjs_tt_pr_2020}.
+
+We forked the Next.js repository and created a basic Next.js application. We then used the local
+version of Next.js as a dependency for our application. The integration required a few code changes
+in the implementation of Next.js and we ended up with a working version which supported the
+application in dev mode with Trusted Types under enforcement mode. We managed to accomplish this
+with one simply Trusted Types policy in a couple of days.
+
+\bigskip
+\begin{lstlisting}[language=JavaScript, caption=Example of Next.js Trusted Types API]
+let policy;
+
+const whitelistAll = (str) => str;
+
+// The policy getter is a private part of the module
+// and cannot be used directly.
+const getOrCreatePolicy = () => {
+  if (policy) return policy;
+
+  policy = window.trustedTypes?.createPolicy('next', {
+    createHTML: whitelistAll('createHTML'),
+    createScript: whitelistAll('createScript'),
+    createScriptURL: whitelistAll('createScriptURL'),
+  });
+  return policy;
+};
+
+export const __unsafeAllowHtml = (html) => getOrCreatePolicy()?.createHTML(html) ?? html;
+
+export const __unsafeAllowScriptUrl = (scriptUrl) => getOrCreatePolicy()?.createScriptURL(scriptUrl) ?? scriptUrl;
+
+export const __unsafeAllowScript = (script) => getOrCreatePolicy()?.createScript(script) ?? script;
+\end{lstlisting}
+
+The fixes needed were small the Trusted Types API specific for Next.js was encapsulated in a single
+small module. That said, the implementation was only a proof of concept and the policy implemented
+might have allowed more then necessary. However, we decided not to pursue this project no more due
+to different priorities and shifted focus to a different project.
+
+\subsection{Fixing violations reported by Tsec}
+
+Tsec found 8 violations \cite{tsec_output} inside Next.js sources. Out of these 7 were indeed
+Trusted Types violations that needed to be fixed. Some of these could be fixed simply on a type
+system level since they expected a value from the user. The others needed to be allowed explicitely
+by using a policy. The implementation for this proof of concept can be found on github
+\cite{nextjs_fix_tsec_violations_commit}.
+
+Since our utmost goal was to find the sinks and create a prototype for the integration we wrapped
+all of these values in Trusted Types objects. This was to be revisited in the future.
+
+\subsection{Fixing the dev mode of an example application}
+
+Fixing the violations found by Tsec was not enough and the application still wouldn't launch with
+Trusted Types enforced. The reason for this hasn't been clear, but it was probably a webpack plugin
+used in one of the Next.js dependencies. The violating code relied on eval, which threw an error
+when Trusted Types were enforced. The workaround for this was to use a default policy and allow all
+eval calls.
+
+Apart from this, there was another violation that was triggered caused by application hot reloading
+(\ref{def:hot_reload}). Tsec wasn't able to catch this, since the violation came from a JavaScript
+file where the AST information was limited.
