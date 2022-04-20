@@ -22,3 +22,18 @@
 [submodule "code/trusted-types"]
 	path = code/trusted-types
 	url = git@github.com:Siegrift/trusted-types.git
+[submodule "code/solid"]
+	path = code/solid
+	url = git@github.com:Siegrift/solid.git
+[submodule "code/babel-plugin-jsx-dom-expressions"]
+	path = code/babel-plugin-jsx-dom-expressions
+	url = git@github.com:Siegrift/babel-plugin-jsx-dom-expressions.git
+[submodule "code/dom-expressions"]
+	path = code/dom-expressions
+	url = git@github.com:Siegrift/dom-expressions.git
+[submodule "code/vite"]
+	path = code/vite
+	url = git@github.com:Siegrift/vite.git
+[submodule "code/solid-realworld"]
+	path = code/solid-realworld
+	url = git@github.com:Siegrift/solid-realworld.git
