@@ -21,15 +21,4 @@
         reload (HMR) is that the running application running in development mode is automatically
         restarted after code changes are made. The former restarts the whole app, the latter only
         patches the running application with code changed and preserves the application state.
-  \item \label{def:dom_xss} \textbf{DOM XSS} - DOM Based XSS is an XSS attack wherein the attack
-        payload is executed as a result of modifying the DOM environment in the victim's browser
-        used by the original client side script, so that the client side code runs in an
-        "unexpected" manner \cite{owasp_dom_xss_def}.
-  \item \label{def:csp} \textbf{CSP} - Content Security Policy (CSP) is an added layer of security
-        that helps to detect and mitigate certain types of attacks, including XSS and data injection
-        attacks \cite{mdn_csp_def}. CSP provides a way for browsers to create safer APIs in a
-        backwards compatible manner, since the API has to be opt in explicitely by the application
-        server by sending the CSP response header or using the CSP inside the HTML meta tag in the
-        response body. If the browser does not support the CSP directive, the directive is ignored
-        and standard browser behaviour applies.
 \end{enumerate}

@@ -50,12 +50,13 @@ HTML, JavaScript and CSS all in the same file. However, the specification \cite{
 generic and can be used for multiple use cases and not only strictly UI related.
 
 \subsection{Solid.js JSX preprocessor}
+\label{jsx_solid_preprocessor}
 
-One of these non React JSX use case is the JSX preprocessing inside solid.js framework (TODO:
-reference). This framework on the surface looks like React as it is component oriented, uses the JSX
-to for component code and supports native APIs which resemble the React hooks API. The important
-fact is that the translated JSX is very different under the hood. React translates the JSX to
-\text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
+One of these non React JSX use case is the JSX preprocessing inside solid.js framework
+(\ref{section:solid}). This framework on the surface looks like React as it is component oriented,
+uses the JSX to for component code and supports native APIs which resemble the React hooks API. The
+important fact is that the translated JSX is very different under the hood. React translates the JSX
+to \text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
 The framework differences are not that important for this paper. However, both of them use Babel to
 transform the easier to more convenient JSX syntax to JavaScript compatible code. You can see the
 transformation in action in the code listings below (generated using Solid.js playground

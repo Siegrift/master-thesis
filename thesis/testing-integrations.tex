@@ -8,8 +8,15 @@ whole application in browser environment and test the application features from 
 perspective.
 
 \section{Cypress Trusted Types plugin}
+\label{cypress_testing_plugin}
 
-Even though Cypress (\ref{intro:cypress}) supports Trusted Types out of the box, there are a few
+Cypress is one of the most popular frameworks for end to end testing of web applications
+\cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
+tests in real browsers and is fast and reliable due to its unique architecture. Developers can test
+the Trusted Types compliant applications in Cypress out of the box, because most of the Cypress
+commands only query the DOM which does not produce Trusted Types violations.
+
+Even though Cypress supports Trusted Types out of the box, there are a few
 nuances the developer has to overcome to be able to test the application and Trusted Types
 violations. For this reason, we have created a Cypress plugin which abstracts the low level details
 and provides a nicer API for the developers to use.
