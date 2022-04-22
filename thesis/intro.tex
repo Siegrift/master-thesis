@@ -9,7 +9,7 @@ prevent these vulnerabilities. Lastly, we describe the motivation and background
 \section{Cross site scripting}
 
 Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
-of web applications taking untrusted user input and interpreting is as code without sanitization or
+of web applications taking untrusted user input and interpreting it as code without sanitization or
 escaping. There are multiple categories of XSS. Most experts distinguish at least between
 non-persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
 category, \emph{DOM based XSS}, which will be explained in more depth as this is the threat model
@@ -19,7 +19,7 @@ under which Trusted Types operate.
   \item  Stored -- A malicious injected script is permanently saved in a server database. The client
         \emph{(user's browser)} will then ask the server for the requested page and the response
         from the server will contain the malicious script.
-  \item  Reflected -- Typically delivered via email or a neutral web site. It occurs when a
+  \item  Reflected -- Typically delivered via email or a neutral website. It occurs when a
         malicious script is reflected off of a web application to the victim's browser
         \cite{reflected_xss}.
   \item  DOM based -- The vulnerability appears in the DOM by executing a malicious code. In
@@ -49,7 +49,7 @@ Worker()
 
 \begin{figure}[H]
   \centerline{\includegraphics[width=1\textwidth]{images/xss-attack.png}}
-  \caption[Common XSS vulnerability flow]{Common XSS vulnerability flow}
+  \caption[Common XSS vulnerability flow \cite{xss_image}]{Common XSS vulnerability flow \cite{xss_image}}
   \label{img:xss}
 \end{figure}
 
@@ -78,7 +78,7 @@ https://example.com?<img%20src=x%20onerror="alert(1)"></img>
 
 The consequences of XSS vary a lot. Their severity can range from benign annoyances to unrecoverable
 damages such as full account compromise, disclosure of user's cookies, storage, secrets or session.
-Other attacks may use XSS to change the application content and present falsy information to the
+Other attacks may use XSS to change the application content and present fraudulent information to the
 user.
 
 There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
@@ -93,7 +93,7 @@ mitigating XSS \cite{tt_design_history}.
 
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
 XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
-directly in the web browser. They are delivered through a CSP header and have a report-only mode
+directly in the web browser. They are delivered through a CSP header and have a report only mode
 that does not change the application behavior and an enforcement mode that may cause user-observable
 breakages \cite{tt_background}.
 
@@ -126,15 +126,15 @@ measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:no
 \begin{itemize}
   \item preventing or mitigating server side generated markup attacks -- Defending against XSS on
         both client and server can be really complex, especially for applications where parts of the
-        code can run on both client and server, such as NextJS (\ref{intro-nextjs}). To address
-        these attacks, use the existing recommended solutions like templating systems or CSP
+        code can run on both client and server, for example as in NextJS (\ref{intro-nextjs}). To
+        address these attacks, use the existing recommended solutions like templating systems or CSP
         \emph{script-src}.
   \item controling subresource loading -- Trusted Types deal with code running in realm of the
         current document and does not guard subresources.
   \item guarding cross origin JavaScript execution, for example loading new documents via
-        \emph{data:} URLs -- Trusted Types do not guard cross origin executions as all
+        \emph{data:} URLs -- Trusted Types do not guard cross origin executions at all
   \item protecting against malicious developers of the web application -- It is implicitly assumed
-        that untrusted developer can cause much severe damages. Attempting to guard against
+        that untrusted developer can cause more severe damages. Attempting to guard against
         malicious developer would lead to complex and impractical design.
 \end{itemize}
 
@@ -245,10 +245,9 @@ though the application is not fully Trusted Types complaint.
 This feature is intended to be used by applications with legacy or third party code that uses
 injection sinks. The policy callback functions should be defined with very strict rules to prevent
 bypassing security restrictions enforced by Trusted Types API. For example, having an "accept all"
-default policy defeats enabled all malicious attacker payloads to reach the DOM sinks. Developers
-should be very cautious when using the default policy and preferably use it only for a transitional
-period until the offending code is refactored not to use the dangerous DOM sinks
-\cite{tt_spec:default_policy}.
+default policy allows malicious attacker payloads to reach the DOM sinks. Developers should be very
+cautious when using the default policy and preferably use it only for a transitional period until
+the offending code is refactored not to use the dangerous DOM sinks \cite{tt_spec:default_policy}.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creating a default policy \cite{tt_spec:default_policy}]
@@ -267,12 +266,12 @@ trustedTypes.createPolicy('default', {
 
 Consider the process of security reviews for web applications, specifically reasoning about DOM
 based XSS. There are many tools and methodologies which can help reason about the application
-security, but there is no automated way that can assert the web application safety. This means that
+security, but there is no automated way that can assert the safety of an web application. This means that
 it is still necessary for security engeneers to manually review the implementation and look for
 potential vulnerabilities and analyze them.
 
 When focusing on client side XSS, the engineer has to determine whether application uses dangerous
-DOM sinks, either implicitely and explicitely, and whether there is way for attacker to misuse them.
+DOM sinks, either implicitely or explicitely, and whether there is a way for attacker to misuse them.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Possibly dangerous function]
@@ -340,7 +339,7 @@ There are multiple variants of the polyfill:
 \section{Motivation and background}
 
 Trusted Types provide opportunity to significantly reduce the risk of a client side XSS and has been
-proven in various projects or various scale \cite{tt_web_framework_paper}
+proven in various projects of various scale \cite{tt_web_framework_paper}
 \cite{tt_integration_list}. However, projects need to refactor parts of their code, which can be
 difficult, especially in the open source world where the software is composed by multiple
 dependencies which can't easily be modified. This presents a large barrier in Trusted Types adoption

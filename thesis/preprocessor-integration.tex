@@ -54,9 +54,9 @@ generic and can be used for multiple use cases and not only strictly UI related.
 
 One of these non React JSX use case is the JSX preprocessing inside solid.js framework
 (\ref{section:solid}). This framework on the surface looks like React as it is component oriented,
-uses the JSX to for component code and supports native APIs which resemble the React hooks API. The
-important fact is that the translated JSX is very different under the hood. React translates the JSX
-to \text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
+uses the JSX and supports native APIs which resemble the React hooks API. The important fact is that
+the translated JSX is very different under the hood. React translates the JSX to
+\text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
 The framework differences are not that important for this paper. However, both of them use Babel to
 transform the easier to more convenient JSX syntax to JavaScript compatible code. You can see the
 transformation in action in the code listings below (generated using Solid.js playground
@@ -184,7 +184,7 @@ three places which cause Trusted Types violations. These can be categorized into
 
 \begin{itemize}
   \item Creation of style elements -- Internally, Vite used \textit{innerHTML} of an HTML style
-        element to create apply styles to the DOM. These two occurrences can be replaced with a
+        element to apply styles to the DOM. These two occurrences can be replaced with a
         safer alternative using \textit{textContent} which does not trigger a Trusted Types
         violation, but works for CSS stylesheet creation.
 
@@ -205,7 +205,7 @@ if (!style) {
         usually happens when there is an syntax error in the code. The overlay widget uses
         \textit{innerHTML} property to inject the overlay HTML markup on top of the client's web
         page. The solution in this case was to introduce a Trusted Types policy to wrap the overlay
-        code inside Trusted Types policy. Alternative solution would be to to create the overlay
+        code inside Trusted Types policy. Alternative solution would be to create the overlay
         markup dynamically using \textit{document.createElement}.
 
         In the future, the Trusted Types API might provide support for constructing trusted values

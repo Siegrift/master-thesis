@@ -18,7 +18,7 @@ commands only query the DOM which does not produce Trusted Types violations.
 
 Even though Cypress supports Trusted Types out of the box, there are a few
 nuances the developer has to overcome to be able to test the application and Trusted Types
-violations. For this reason, we have created a Cypress plugin which abstracts the low level details
+violations. For this reason, we created a Cypress plugin which abstracts the low level details
 and provides a nicer API for the developers to use.
 
 \subsection{Removed CSP header}
@@ -29,7 +29,7 @@ workaround for now, which is to intercept the request of the initial HTML applic
 copy the CSP policy from the response headers to the response body inside a \textit{meta} tag.
 \cite{cypress:csp_removal_issue}.
 
-This is tedious for the developers, so we have created a custom command in our plugin which does
+This is tedious for the developers, so we created a custom command in our plugin which does
 exactly this.
 
 \bigskip
@@ -74,7 +74,7 @@ it('supports TT', () => {
 });
 \end{lstlisting}
 
-To simplify this low level handling for the developers we have created a custom command which
+To simplify this low level handling for the developers we created a custom command which
 recognizes Trusted Types violations and remembers them for the lifetime of the current test so they
 can be asserted later on.
 
