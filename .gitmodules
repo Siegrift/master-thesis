@@ -40,3 +40,6 @@
 [submodule "code/webpack-dev-server"]
 	path = code/webpack-dev-server
 	url = git@github.com:Siegrift/webpack-dev-server.git
+[submodule "code/tt-cra-app"]
+	path = code/tt-cra-app
+	url = git@github.com:Siegrift/tt-cra-app.git
