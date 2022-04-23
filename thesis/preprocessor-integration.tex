@@ -14,9 +14,9 @@ non Trusted Types compliant code. To achieve Trusted Types compliance in framewo
 applications, one must ensure that the resulting code from preprocessing tools is Trusted Types
 compliant or implement the Trusted Types integration themselves.
 
-There are a lot of preprocessors which do not affect the Trusted Type compliance of a code. It is
-hard to formally define this group, but these are usually the code transformations which do not
-change the semantics of the code. For example:
+There are a lot of preprocessors which do not affect Trusted Type compliance of a code. It is hard
+to formally define this group, but these are usually the code transformations which do not change
+the semantics of the code. For example:
 
 \begin{itemize}
   \item TypeScript -- TypeScript (\ref{def:ts}) compiler transforms the TypeScript sources to
@@ -208,8 +208,8 @@ if (!style) {
         code inside Trusted Types policy. Alternative solution would be to create the overlay
         markup dynamically using \textit{document.createElement}.
 
-        In the future, the Trusted Types API might provide support for constructing trusted values
-        from string constants via template literals, but this is not yet supported.
+        In the future, Trusted Types API might provide support for constructing trusted values from
+        string constants via template literals, but this is not yet supported.
 
         \bigskip
         \begin{lstlisting}[language=JavaScript, caption=Creation of error overlay using innerHTML property \cite{commit_vite_inner_html_overlay}]

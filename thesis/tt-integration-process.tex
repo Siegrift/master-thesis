@@ -1,8 +1,8 @@
 \chapter{Trusted Types integration process}
 \label{tt_integration_setup}
 
-Integrating Trusted Types to target applications and libraries might seem as a complex task that
-requires good knowledge of the target inner workings. There is a small sample of already implemented
+Integrating Trusted Types to applications and libraries might seem as a complex task that requires
+good knowledge of the project internals. There is a small sample of already implemented
 integrations, which shows that the necessary code changes are relatively small
 \cite{tt_integration_list}. Based on our experience, the integration does not require an exprteese
 of the projects inner workings neither. This experience is also supported by other integration
@@ -12,22 +12,22 @@ follow the same steps:
 \begin{enumerate}
   \item Locate all of the DOM sinks
   \item Find the most suitable workaround for every sink found
-  \item Implement the integration and release a new version of the target
+  \item Implement the integration and release a new version of the library
 \end{enumerate}
 
-\section{Locate all of the DOM sinks}
+\section{Locating all of the DOM sinks}
 
-Locating the sinks of the integration target is important for scoping the integration effort and the
-implementation afterwards. This task is complex since there is no bulletproof way of locating all of
-the sinks in a codebase. This is because JavaScript is a dynamic language and it is possible to
-access and set the sink values dynamically using the property element access.
+Locating the sinks of the integration library is important for scoping the integration effort and
+the implementation afterwards. This task is complex since there is no bulletproof way of locating
+all of the sinks in a codebase. This is because JavaScript is a dynamic language and it is possible
+to access and set the sink values dynamically using the property element access.
 
 Fortunately, there are a few methods and tools, which can help to catch most of the sinks:
 
 \begin{enumerate}
   \item Static search through the codebase
   \item Static code analyzers
-  \item Using the target in an real world application
+  \item Using the library in an real world application
 \end{enumerate}
 
 \subsection{Static search through the codebase}
@@ -56,7 +56,7 @@ JavaScript. One can then build and use tools like Tsec \cite{tsec_github} which 
 parse the source code and create the AST to ultimately find the sinks in a more reliable manner and
 produces less false positives.
 
-These tools have an advantage that they can be used to maintain the Trusted Types compatibility even
+These tools have an advantage that they can be used to maintain Trusted Types compatibility even
 after the violations are fixed. For example, they can be run in CI pipeline or their output can be
 leveraged by linters and other language plugin tools and the errors can be shown to the developers
 early on and directly in their IDE \cite{tsec_lsp}.
@@ -82,7 +82,7 @@ Library authors need to test how the integration works when used with applicatio
 DOM sinks and now has to produce Trusted Types values. These are done best by creating an
 application from scratch by the integration author.
 
-\section{Find the most suitable workaround for every sink found}
+\section{Finding the most suitable workaround for every sink found}
 
 In this section, we assume that all of the sinks discussed produce Trusted Types violations. Note,
 that a sink can produce a Trusted Types violation for a value that is probably safe. For example, this happens
@@ -108,7 +108,7 @@ this solution is not applicable.
 \subsection{Wrap the value passed to the sink in a Trusted Types policy}
 
 When there is no way to avoid using the sink and the value is trusted, one has to use a Trusted
-Types policy to promote the trusted value to a Trusted Types instance. One should apply the Trusted
+Types policy to promote a trusted value to a Trusted Types instance. One should apply a Trusted
 Types policy where the trusted value is created, not where it is passed to a sink. For example, the
 author should promote a value to Trusted Type immediately after sanitization or escaping. This way
 the immutability of Trusted Types can preserve the "trust" independently of how the value flows
@@ -123,9 +123,9 @@ or library used to modify this value it now needs to be refactored to readonly u
 
 As we mentioned, Trusted Types instances are immutable values. Previously the DOM sinks accepted a
 string values so the application or library might be used to call string operations on the value.
-Such code was valid, but now the Trusted Types values do not have string methods defined and trying
-to call them will result in an error. Another problem is stringification which converts the Trusted
-Types instance to a string, which then throws an error when the value is passed to the sink.
+Since the new values do not have string methods defined any attempt trying to call them will result
+in an error. Another problem is stringification which converts a Trusted Types instance to a string,
+which then throws an error when the value is passed to the sink.
 
 The integration author needs to refactor the library or application to prevent modifying the
 Trusted values to preserve the trust guarantees secured by Trusted Types.
@@ -170,12 +170,12 @@ dependencies are Trusted Types complaint as well.
 When there is non compliant dependency, one has multiple options:
 
 \begin{itemize}
-  \item Implement the integration for the dependency - This option leads to recursive integrations
+  \item Implement the integration for the dependency -- This option leads to recursive integrations
         and has all the problems already mentioned and can possible lead to many more integrations.
-  \item Find an alternative dependency - This option is often impossible as a viable alternative
+  \item Find an alternative dependency -- This option is often impossible as a viable alternative
         might not exist and projects might not want to use an alternative only because of Trusted
         Types compliance.
-  \item Use Trusted Types default policy - This option should only be used by end applications and
+  \item Use Trusted Types default policy -- This option should only be used by end applications and
         is more complex. The application is not fully Trusted Types compliant and it can also lead
         to a reduced performance.
 \end{itemize}

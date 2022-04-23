@@ -13,8 +13,8 @@ perspective.
 Cypress is one of the most popular frameworks for end to end testing of web applications
 \cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
 tests in real browsers and is fast and reliable due to its unique architecture. Developers can test
-the Trusted Types compliant applications in Cypress out of the box, because most of the Cypress
-commands only query the DOM which does not produce Trusted Types violations.
+Trusted Types compliant applications in Cypress out of the box, because most of the Cypress commands
+only query the DOM which does not produce Trusted Types violations.
 
 Even though Cypress supports Trusted Types out of the box, there are a few
 nuances the developer has to overcome to be able to test the application and Trusted Types
@@ -59,11 +59,11 @@ Cypress.Commands.add('enableCspThroughMetaTag', (options) => {
 
 \subsection{Testing the violations}
 
-While it is easy to test that the Trusted Types are supported (\ref{lst:cypress_test_tt_support}) it
+While it is easy to test whether Trusted Types are supported (\ref{lst:cypress_test_tt_support}) it
 is harder to test whether some part of the code triggered Trusted Types violation. The reason is
 that the violation does not produce any user visible behaviour because the DOM is unchanged and
 uncaught exception is thrown and Cypress automatically fails the test. The developer needs to listen
-to \textit{uncaught:exception} handler from Cypress and explicitely recognize the Trusted Types
+to \textit{uncaught:exception} handler from Cypress and explicitely recognize a Trusted Types
 violation based on the error thrown and tell Cypress that this error is intended so it doesn't fail
 the test.
 

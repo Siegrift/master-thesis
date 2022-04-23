@@ -11,7 +11,7 @@ mitigate these vulnerabilities. Lastly, we describe the motivation and backgroun
 Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
 of web applications taking untrusted user input and interpreting it as code without sanitization or
 escaping. There are multiple categories of XSS. Most experts distinguish at least between
-non-persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
+non persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
 category, DOM based XSS, which will be explained in more depth as this is the threat model
 under which Trusted Types operate.
 
@@ -95,7 +95,7 @@ mitigating XSS \cite{tt_design_history}.
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
 XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
 directly in the web browser. They are delivered through a CSP header and have a report only mode
-that does not change the application behavior and an enforcement mode that may cause user-observable
+that does not change the application behavior and an enforcement mode that may cause user observable
 breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks from being called with values that have
@@ -126,7 +126,7 @@ measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:no
 \begin{itemize}
   \item preventing or mitigating server side generated markup attacks -- Defending against XSS on
         both client and server can be really complex, especially for applications where parts of the
-        code can run on both client and server, for example as in NextJS (\ref{intro-nextjs}). To
+        code can run on both client and server, for example as in Next.js (\ref{intro-nextjs}). To
         address these attacks, use the existing recommended solutions like templating systems or CSP
         \emph{script-src}.
   \item controling subresource loading -- Trusted Types deal with code running in realm of the
@@ -192,7 +192,7 @@ Types policies.
 \label{subsec:tt_policy}
 
 The core part of Trusted Types API are policies which are factory functions for creating "trusted"
-values which can be assigned to DOM sinks when Trusted Types are enabled. The policies are created
+values which can be passed to DOM sinks when Trusted Types are enabled. The policies are created
 by the application and access to them should be restricted. In javascript this can be easily
 achieved by encapsulating a policy in its own module and exporting only a very specific functions
 which use this policy internally.
@@ -229,6 +229,10 @@ const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
   createHTML: (untrustedValue) => DOMPurify.sanitize(untrustedValue),
 });
 \end{lstlisting}
+
+It is important to ensure that policies are either secure for all possible inputs, or limit the
+access to insecure policies, such that they are only called with non attacker controlled inputs
+\cite{tt_spec:best_practice_policy}.
 
 \subsection{Default policy}
 
@@ -328,10 +332,10 @@ security properties as in the browsers where they are supported \cite{xss_nowher
 There are multiple variants of the polyfill:
 
 \begin{itemize}
-  \item Full -- Defines the Trusted Types API, parses the \textit{meta} tag from the HTML and
+  \item Full -- Creates the API of Trusted Types, parses the \textit{meta} tag from the HTML and
         enables the enforcement in the DOM.
-  \item API only -- Defines the Trusted Types API so you can use policies and create trusted values,
-        but no enforcement rules are applied.
+  \item API only -- Creates the API of Trusted Types so you can use policies and create trusted
+        values, but no enforcement rules are applied.
   \item Tiny -- Polyfills only the most important part of the API surface with a single line of code
         for a minimal bundle size.
 \end{itemize}

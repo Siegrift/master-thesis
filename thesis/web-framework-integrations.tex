@@ -115,10 +115,9 @@ can be configured to be Trusted Types compliant by a small configuration change
 \cite{webpack_tt_config}.
 
 The problem with CRA is that the webpack configuration is hidden from the user. Unfortunately, there
-is no way how to override this configuration manually. This means that there is not a simple way how
-to enable the Trusted Types integration. The workaround is to spy on imported JavaScript modules and
-change their content. This pattern is often used when mocking or spying in unit tests. However,
-it is also a suitable solution for this case \cite{cra_modify_webpack_config}.
+is no way how to override this configuration manually. The workaround is to spy on imported
+JavaScript modules and change their content. This pattern is often used when mocking or spying in
+unit tests. However, it is also a suitable solution for this case \cite{cra_modify_webpack_config}.
 
 Another issue we faced was caused by \emph{webpack-dev-server} which is only used in development and
 provides features like hot module reloading or showing error overlays. We found out that the error
@@ -190,7 +189,8 @@ because Vite is the preferred bundler for developing Solid.js application and we
 that our integration works properly.
 
 The only changes we needed to implement were to use our custom version of Vite and rename the file
-extension for all source files from \emph{.js} to \emph{.jsx} in order for Vite to correctly preprocess the JSX. We also used the custom version of Solid.js to generate Trusted Types compliant
+extension for all source files from \emph{.js} to \emph{.jsx} in order for Vite to correctly
+preprocess the JSX. We also used the custom version of Solid.js to generate Trusted Types compliant
 code after JSX transformation. You can see the code difference for these changes in
 \cite{solid_realworld_project:vite}.
 
