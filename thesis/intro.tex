@@ -192,10 +192,11 @@ Types policies.
 \label{subsec:tt_policy}
 
 The core part of Trusted Types API are policies which are factory functions for creating "trusted"
-values which can be passed to DOM sinks when Trusted Types are enabled. The policies are created
-by the application and access to them should be restricted. In javascript this can be easily
+values which can be safely passed to DOM sinks when Trusted Types are enabled. The policies are
+created by the application and access to them should be restricted. In javascript this can be easily
 achieved by encapsulating a policy in its own module and exporting only a very specific functions
-which use this policy internally.
+which use this policy internally. The values created from the policies are unforgeable and
+immutable, meaning there is no way for attacker to pass a value to dangerous DOM APIs.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creating a Trusted Types policy, label={lst:create_tt_policy}]
@@ -321,7 +322,7 @@ sink.
 Trusted Types are currently supported in Chromium family of browsers \cite{mdn:tt_compatibility}.
 Developers creating Trusted Types compliant application should always check if Trusted Types API is
 available in the current execution context, which does not necessary need to be a browser. It is
-very common for nodeJS applications to pre render the client side code on the server to provide
+very common for Node.js applications to pre render the client side code on the server to provide
 faster experience for the end users. This brings additional complexity and new attack vectors in
 forms of reflected XSS, various kinds of injection and more, which are out of Trusted Types scope.
 
@@ -352,7 +353,7 @@ library authors to migrate to Trusted Types because there is not is not enough u
 is not enough usage because a lot of applications are prevented to migrate because their
 dependencies do not work with Trusted Types.
 
-There is usually a knowledge gap between security engineers and software developers, the former
+There is a point of view conflict between security engineers and software developers, the former
 focus on security, the latter on the application features. Trusted Types bridge this gap by
 providing secure by default software. The ideal scenario would be if the open source libraries used
 Trusted Types transparently to the application authors.

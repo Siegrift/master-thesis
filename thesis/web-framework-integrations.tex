@@ -13,10 +13,10 @@ each unique property of the integration, sinks found and the respective solution
 \label{intro-nextjs}
 
 Next.js is one of the most popular frameworks for building web applications. The framework is build
-upon the React library which is the most used library as of 2021 \cite{react_most_used_2021}. Parts
-of a Next.js application can be rendered statically, server side or fully client side on a page by
-page basis. Next.js is thus not only about the client side code, but it can also handle server side
-logic which opens up different means of attacks such as reflected XSS, SQL injections and more.
+upon React which is the most used UI framework as of 2021 \cite{react_most_used_2021}. Parts of a
+Next.js application can be rendered statically, server side or fully client side on a page by page
+basis. Next.js is thus not only about the client side code, but it can also handle server side logic
+which opens up different means of attacks such as reflected XSS, SQL injections and more.
 
 Next.js was our initial choice for Trusted Types integration, because of the large impact this
 integration would have. The framework itself seemed interested in the integration of Trusted Types
@@ -146,7 +146,7 @@ defaults.__set__('configFactory', (webpackEnv) => {
 })
 \end{lstlisting}
 
-The application is then started simply by running this script using \emph{node} environment.
+The application is then started simply by running this script using Node.js environment.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Starting the CRA application]

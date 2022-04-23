@@ -10,12 +10,12 @@ authors \cite{tt_web_framework_paper}. Each integration is different, but on a h
 follow the same steps:
 
 \begin{enumerate}
-  \item Locate all of the DOM sinks
+  \item Locate DOM sinks
   \item Find the most suitable workaround for every sink found
   \item Implement the integration and release a new version of the library
 \end{enumerate}
 
-\section{Locating all of the DOM sinks}
+\section{Locating DOM sinks}
 
 Locating the sinks of the integration library is important for scoping the integration effort and
 the implementation afterwards. This task is complex since there is no bulletproof way of locating
@@ -26,7 +26,7 @@ Fortunately, there are a few methods and tools, which can help to catch most of 
 
 \begin{enumerate}
   \item Static search through the codebase
-  \item Static code analyzers
+  \item Code analyzers
   \item Using the library in an real world application
 \end{enumerate}
 
@@ -47,7 +47,7 @@ There is not an actively maintained static search tool for finding DOM sinks. Ho
 relatively easy to build a script, which uses the existing tools such as \textit{grep} with a list
 of already known sinks \cite{xss_sink_finder}.
 
-\subsection{Static code analyzers}
+\subsection{Code analyzers}
 
 A better approach at searching for the DOM sinks statically, is to search through the AST of the
 code. The quality of the output produced depends on the quality of the AST information. When the
@@ -85,8 +85,8 @@ application from scratch by the integration author.
 \section{Finding the most suitable workaround for every sink found}
 
 In this section, we assume that all of the sinks discussed produce Trusted Types violations. Note,
-that a sink can produce a Trusted Types violation for a value that is probably safe. For example, this happens
-when a constant string is assigned to an innerHTML property of an DOM element.
+that a sink can produce a Trusted Types violation for a value that is provably secure. For example,
+this happens when a constant string is assigned to an innerHTML property of an DOM element.
 
 Generally, there are three ways how to resolve a Trusted Types violation produced by a sink:
 
