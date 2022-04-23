@@ -19,14 +19,14 @@ hard to formally define this group, but these are usually the code transformatio
 change the semantics of the code. For example:
 
 \begin{itemize}
-  \item TypeScript -- TypeScript compiler transforms the TypeScript sources to equivalent code
-        written in JavaScript by mostly removing the type annotations. Such transformation yields
-        semantically equivalent code.
+  \item TypeScript -- TypeScript (\ref{def:ts}) compiler transforms the TypeScript sources to
+        equivalent code written in JavaScript by mostly removing the type annotations. Such
+        transformation yields semantically equivalent code.
   \item Transformation to older JavaScript standard -- One of the most common functionality of Babel
         is to transpile code written in modern JavaScript language to older standard compatible with
         wide range of browsers and browser versions. Many of these transformations are solved with
         polyfills or simple AST replacements but the code remains semantically the same.
-  \item Minification and obfuscation -- The purpose of the code minification is to reduce the
+  \item Minification -- The purpose of the code minification is to reduce the
         overall bundle size that needs to be sent by the server to the clients browser. In practice
         this includes removing dead code, changing the names of the functions, shortening
         expressions and statements, however the minified code is functionally equivalent to the non

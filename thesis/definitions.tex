@@ -3,22 +3,33 @@
 \markboth{Concepts and definitions}{Concepts and definitions} % vyriesenie hlaviciek
 \label{definitions}
 
-\textit{These are the common terms used in this paper that should be understood by the reader before
-  reading the paper. Advanced readers may skip this section and start with the first chapter
-  (\ref{chapter_intro}).}
+\textit{These are the common terms used in this paper that are too broad to be explained in specific
+  chapters, but should be understood by the reader before reading the paper. Advanced readers may
+  skip this section and start with the first chapter (\ref{chapter_intro}).}
 
 % Need to use "enumerate" otherwise linking stops working. See:
 % https://texblog.org/2012/03/21/cross-referencing-list-items/
 \begin{enumerate}
+  \item \label{def:dom} \textbf{DOM} - DOM stands for \emph{Document Object Model} and it is
+        the data representation of the objects that comprise the structure and content of a web
+        page.
   \item \label{def:dom_source_sink} \textbf{DOM source and sink} - In the context of XSS, a DOM
-        source is the location from which untrusted data is taken by the application (which can be
-        controlled by user input) and passed on to the sink (e.g. location, cookies). Sinks are the
-        places where untrusted data coming from the sources is actually getting executed resulting
-        in DOM XSS (e.g. eval, element.innerHTML) \cite{source_sink_definition}. We might also refer
-        to sink as injection sink, because the untrusted value is injected into the sink by the
-        attacker.
-  \item \label{def:hot_reload} \textbf{Hot module reload} - The concept of live or hot module
-        reload (HMR) is that the running application running in development mode is automatically
+        source is the location from which untrusted data is taken by the application and passed on
+        to the sink, for example \emph{location} or \emph{cookies}. DOM Sinks are the places where
+        untrusted data coming from the sources is actually getting executed resulting in DOM XSS,
+        for example \emph{eval} or \emph{Element.innerHTML}. \cite{source_sink_definition}. We might
+        also refer to a sink as an \emph{injection sink}, because the untrusted value is injected
+        into the sink by the attacker.
+  \item \label{def:spa} \textbf{SPA} - SPA stands for \emph{Single Page Applications} and it
+        is a website which interacts with the user by dynamically rewriting the contents of the site
+        instead of loading new pages from the server.
+  \item \label{def:ts} \textbf{TypeScript} - TypeScript is a strict syntactical superset of
+        JavaScript and adds optional static typing to the language. It is designed for the
+        development of large applications and transpiles to JavaScript.
+  \item \label{def:hot_reload} \textbf{Hot module reload} - The concept of a \emph{hot module reload
+          (HMR)} is that the running application running in development mode is automatically
         restarted after code changes are made. The former restarts the whole app, the latter only
         patches the running application with code changed and preserves the application state.
+  \item \label{def:npm} \textbf{npm} - \emph{npm} is a package manager for the JavaScript
+        language and JavaScript runtime environment Node.js.
 \end{enumerate}

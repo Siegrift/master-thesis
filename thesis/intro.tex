@@ -1,10 +1,10 @@
 \chapter{Introduction}
 \label{chapter_intro}
 
-In this chapter we give a brief overview of Cross site scripting (XSS), which is one of the most
+In this chapter we give a brief overview of cross site scripting (XSS), which is one of the most
 common web application vulnerabilities. We mainly focus on DOM based XSS for which Trusted Types are
-the most effective. We then explain the design of Trusted Types and how it helps to mitigate and
-prevent these vulnerabilities. Lastly, we describe the motivation and background for our work.
+the most effective. We then explain the design of Trusted Types and how it helps to detect and
+mitigate these vulnerabilities. Lastly, we describe the motivation and background for our work.
 
 \section{Cross site scripting}
 
@@ -12,31 +12,32 @@ Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the w
 of web applications taking untrusted user input and interpreting it as code without sanitization or
 escaping. There are multiple categories of XSS. Most experts distinguish at least between
 non-persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
-category, \emph{DOM based XSS}, which will be explained in more depth as this is the threat model
+category, DOM based XSS, which will be explained in more depth as this is the threat model
 under which Trusted Types operate.
 
 \begin{itemize}
   \item  Stored -- A malicious injected script is permanently saved in a server database. The client
-        \emph{(user's browser)} will then ask the server for the requested page and the response
-        from the server will contain the malicious script.
+        browser will then ask the server for the requested page and the response from the server
+        will contain the malicious script.
   \item  Reflected -- Typically delivered via email or a neutral website. It occurs when a
         malicious script is reflected off of a web application to the victim's browser
         \cite{reflected_xss}.
-  \item  DOM based -- The vulnerability appears in the DOM by executing a malicious code. In
-        reflected and stored XSS attacks you can see the vulnerability payload in the server
-        response. However in a DOM based XSS, the attack payload is executed as a result of
+  \item  DOM based -- The vulnerability appears in the DOM (\ref{def:dom}) by executing a malicious
+        code. In reflected and stored XSS attacks you can see the vulnerability payload in the
+        server response. However in a DOM based XSS, the attack payload is executed as a result of
         modifying the DOM environment in the victim's browser so that the client side code runs in
         an unexpected manner.
 \end{itemize}
 
 Cross site scripting vulnerability became more widespread with the boom of single page applications
-(SPA) where most of the behaviour is achieved by modifying the DOM using JavaScript. There are many
-functions, element attributes and properties in the DOM API which interpret the arguments as an
-executable code. We call these DOM sinks (\ref{def:dom_source_sink}). These sinks make it easy for
-developers to accidentally introduce this vulnerability \cite{tt_web_framework_paper}.
+(SPA) (\ref{def:spa}), where most of the behaviour is achieved by modifying the DOM using
+JavaScript. There are many functions, element attributes and properties in the DOM API which
+interpret the arguments as an executable code. We call these DOM sinks (\ref{def:dom_source_sink}).
+These sinks make it easy for developers to accidentally introduce this vulnerability
+\cite{tt_web_framework_paper}.
 
 \bigskip
-\begin{lstlisting}[language={}, caption=Examples of most common DOM XSS sinks \cite{dom_xss_portswigger} \cite{tt_web_framework_paper}]
+\begin{lstlisting}[language={}, caption=Common DOM XSS sinks \cite{dom_xss_portswigger} \cite{tt_web_framework_paper}]
 document.write()
 element.innerHTML
 element.insertAdjacentHTML
@@ -97,18 +98,17 @@ directly in the web browser. They are delivered through a CSP header and have a 
 that does not change the application behavior and an enforcement mode that may cause user-observable
 breakages \cite{tt_background}.
 
-When enforced, Trusted Types block dangerous injection sinks (\ref{def:dom_source_sink}) from being
-called with values that have not passed through a Trusted Types policy \cite{tt_background}. If an
-untrusted value is passed to sink a Trusted Types violation is raised and the DOM is unaffected. In
-practice this means that a potential DOM XSS has been prevented.
+When enforced, Trusted Types block dangerous injection sinks from being called with values that have
+not passed through a Trusted Types policy \cite{tt_background}. If an untrusted value is passed to
+sink a Trusted Types violation is raised and the DOM is unaffected. In practice this means that a
+potential DOM XSS has been prevented.
 
 There are many other resources which can be used to explore Trusted Types in details
 \cite{tt_resources}.
 
 \subsection{Threat model}
 
-Trusted Types is a powerful API with a well scoped threat model. The main goals of the API are to
-\cite{tt_spec:goals}:
+Trusted Types is a powerful API. Its main goals are to \cite{tt_spec:goals}:
 
 \begin{itemize}
   \item reduce the risk of client side vulnerabilities caused by injection sinks.
@@ -118,7 +118,7 @@ Trusted Types is a powerful API with a well scoped threat model. The main goals 
   \item reduce the security review surface for applications and libraries.
 \end{itemize}
 
-The main idea behind Trusted Types is to make the dangerous DOM APIs secure by default and motivate
+The main idea behind Trusted Types is to make the dangerous DOM APIs secure by default and encourage
 application authors to use safer APIs. This model is very effective for preventing DOM based XSS,
 however there are still areas where Trusted Types are not effective enough and other security
 measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:non_goals}:
@@ -156,14 +156,14 @@ Trusted Types are enabled through a CSP using two different directives:
 
         \bigskip
         % NOTE: To remove vertical space when using listing without caption \begin{lstlisting}[language={}, belowskip=-1.2 \baselineskip]
-        \begin{lstlisting}[language={}, caption=Syntax of require-trusted-types-for directive]
+        \begin{lstlisting}[language={}, caption=Syntax of \emph{require-trusted-types-for directive}]
 Content-Security-Policy: require-trusted-types-for 'script';\end{lstlisting}
 
   \item \textit{trusted-types} -- This directive instructs user agents to restrict the creation of
         Trusted Types policies (\cite{mdn:trusted-types}). Syntax:
 
         \bigskip
-        \begin{lstlisting}[language={}, caption=Syntax of trusted-types directive]
+        \begin{lstlisting}[language={}, caption=Syntax of \emph{trusted-types directive}]
 Content-Security-Policy: trusted-types;
 Content-Security-Policy: trusted-types 'none';
 Content-Security-Policy: trusted-types <policyName>;
