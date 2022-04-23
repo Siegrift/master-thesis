@@ -109,8 +109,8 @@ delegateEvents(["click"]);
 export { Counter };
 \end{lstlisting}
 
-The transformed Solid.js code uses \text{template} function (imported from \textit{solid-js/web}).
-This function internally uses \textit{HTMLTemplateElement.innerHTML} property when creating the
+The transformed Solid.js code uses \text{template} function (imported from \emph{solid-js/web}).
+This function internally uses \emph{HTMLTemplateElement.innerHTML} property when creating the
 template. This triggers a Trusted Types violation when the code is executed in the browser. The
 solution is to create a Trusted Types policy wrapping the content assigned to innerHTML property.
 This is secure, because the JSX transformation only creates the templates from statically known
@@ -150,7 +150,7 @@ const _tmpl$ = template(`<form action="/action_page.php"><input type="text" id="
 \end{lstlisting}
 
 The JSX preprocessing is able to ensure only statically known JSX values are passed to the
-\textit{template} function. These statically known values are coming from the source code written by
+\emph{template} function. These statically known values are coming from the source code written by
 the developer, so this code is implicetelly trusted. Any dynamic properties and attributes are set
 when the component renders and is not part of the generated template calls.
 
@@ -183,9 +183,9 @@ We followed the integration process from chapter (\ref{tt_integration_setup}) an
 three places which cause Trusted Types violations. These can be categorized into:
 
 \begin{itemize}
-  \item Creation of style elements -- Internally, Vite used \textit{innerHTML} of an HTML style
+  \item Creation of style elements -- Internally, Vite used \emph{innerHTML} of an HTML style
         element to apply styles to the DOM. These two occurrences can be replaced with a
-        safer alternative using \textit{textContent} which does not trigger a Trusted Types
+        safer alternative using \emph{textContent} which does not trigger a Trusted Types
         violation, but works for CSS stylesheet creation.
 
         \bigskip
@@ -203,10 +203,10 @@ if (!style) {
   \item Showing error overlay -- Vite supports HMR during development and part of this feature is to
         display error overlay when there is an error triggered by the development server. This
         usually happens when there is an syntax error in the code. The overlay widget uses
-        \textit{innerHTML} property to inject the overlay HTML markup on top of the client's web
+        \emph{innerHTML} property to inject the overlay HTML markup on top of the client's web
         page. The solution in this case was to introduce a Trusted Types policy to wrap the overlay
         code inside Trusted Types policy. Alternative solution would be to create the overlay
-        markup dynamically using \textit{document.createElement}.
+        markup dynamically using \emph{document.createElement}.
 
         In the future, Trusted Types API might provide support for constructing trusted values from
         string constants via template literals, but this is not yet supported.

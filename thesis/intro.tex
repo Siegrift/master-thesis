@@ -151,7 +151,7 @@ the directive is ignored and standard browser behaviour applies.
 Trusted Types are enabled through a CSP using two different directives:
 
 \begin{itemize}
-  \item \textit{require-trusted-types-for} -- This directive instructs user agents to control the
+  \item \emph{require-trusted-types-for} -- This directive instructs user agents to control the
         data passed to DOM XSS sink functions (\cite{mdn:require-trusted-types-for}).
 
         \bigskip
@@ -159,7 +159,7 @@ Trusted Types are enabled through a CSP using two different directives:
         \begin{lstlisting}[language={}, caption=Syntax of \emph{require-trusted-types-for directive}]
 Content-Security-Policy: require-trusted-types-for 'script';\end{lstlisting}
 
-  \item \textit{trusted-types} -- This directive instructs user agents to restrict the creation of
+  \item \emph{trusted-types} -- This directive instructs user agents to restrict the creation of
         Trusted Types policies (\cite{mdn:trusted-types}). Syntax:
 
         \bigskip
@@ -177,8 +177,8 @@ sinks and thus reducing the DOM XSS attack surface to small, isolated parts of t
 This smaller parts can be modularized where they can be more easily monitored, reviewed and
 maintained.
 
-Apart from the standard \textit{Content-Security-Policy} header there is also
-\textit{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in report
+Apart from the standard \emph{Content-Security-Policy} header there is also
+\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in report
 only mode. Trusted Types violations are only interpreted as warnings in this mode. This way the
 application can gradually work on Trusted Types compliance without breaking the existing users. It
 is also recommended to use the report only mode in production for some time to make sure the
@@ -222,7 +222,7 @@ receives the sink value of a string type as an argument and returns a string val
 XSS free and thus can be trusted. In practice, this function may be implemented as identity if the
 payload is known to be trusted. Another good example would be to sanitize the sink value inside this
 callback. In case the payload should not be used or can not be sanitized, you can return
-\textit{null} or \textit{undefined} which will trigger a Trusted Types violation.
+\emph{null} or \emph{undefined} which will trigger a Trusted Types violation.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
@@ -243,7 +243,7 @@ Trusted Types are enabled, the user agent will implicitely flow the untrusted st
 the default policy. The callback function of the default policy receives three arguments instead of
 one -- the string payload, sink type and a sink name respectively. This allows the application to
 recover from an unexpected sink usage, for example by sanitizing the untrusted value. If the default
-policy does not exist, returns \textit{null} or \textit{undefined} a CSP violation will be triggered
+policy does not exist, returns \emph{null} or \emph{undefined} a CSP violation will be triggered
 \cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode even
 though the application is not fully Trusted Types complaint.
 
@@ -313,7 +313,7 @@ functions and its callers. The focus of the security review shifts to reasoning 
 of trusted values and policies. Once a trusted value is created, it is immutable and the policy
 which created it provides the security guarantees. When a trusted value reaches a sink, this
 guarantee still holds independently of how the value flew the callers. Consider the third party call
-in the listing \ref{lst:dangerous_fn_usage} and assume \textit{data.html} contains a TrustedHTML
+in the listing \ref{lst:dangerous_fn_usage} and assume \emph{data.html} contains a TrustedHTML
 value. If a third party call modifies this value a violation is thrown when it is passed to a DOM
 sink.
 
@@ -333,7 +333,7 @@ security properties as in the browsers where they are supported \cite{xss_nowher
 There are multiple variants of the polyfill:
 
 \begin{itemize}
-  \item Full -- Creates the API of Trusted Types, parses the \textit{meta} tag from the HTML and
+  \item Full -- Creates the API of Trusted Types, parses the \emph{meta} tag from the HTML and
         enables the enforcement in the DOM.
   \item API only -- Creates the API of Trusted Types so you can use policies and create trusted
         values, but no enforcement rules are applied.

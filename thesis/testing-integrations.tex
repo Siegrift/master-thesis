@@ -24,9 +24,9 @@ and provides a nicer API for the developers to use.
 \subsection{Removed CSP header}
 
 Cypress removes the CSP header sent by the application server in order to load the application in an
-iframe, which could otherwise be prevented by a \textit{scriptSrc} CSP directive. There is a
+iframe, which could otherwise be prevented by a \emph{scriptSrc} CSP directive. There is a
 workaround for now, which is to intercept the request of the initial HTML application payload and
-copy the CSP policy from the response headers to the response body inside a \textit{meta} tag.
+copy the CSP policy from the response headers to the response body inside a \emph{meta} tag.
 \cite{cypress:csp_removal_issue}.
 
 This is tedious for the developers, so we created a custom command in our plugin which does
@@ -63,7 +63,7 @@ While it is easy to test whether Trusted Types are supported (\ref{lst:cypress_t
 is harder to test whether some part of the code triggered Trusted Types violation. The reason is
 that the violation does not produce any user visible behaviour because the DOM is unchanged and
 uncaught exception is thrown and Cypress automatically fails the test. The developer needs to listen
-to \textit{uncaught:exception} handler from Cypress and explicitely recognize a Trusted Types
+to \emph{uncaught:exception} handler from Cypress and explicitely recognize a Trusted Types
 violation based on the error thrown and tell Cypress that this error is intended so it doesn't fail
 the test.
 
