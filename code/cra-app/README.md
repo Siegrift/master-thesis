@@ -8,21 +8,21 @@
    value and React will accept it. However webpack hot reload will break (since the webpack configuration is abstracted
    by react-scripts of CRA).
 4. Trusted Types integration in webpack must be turned on [in the webpack
-   config](https://webpack.js.org/guides/csp/#trusted-types).
-5. You can either edit the webpack config hidden in `node_modules` of the react scripts and place there:
+   config](https://webpack.js.org/guides/csp/#trusted-types). Unfortunately, the webpack configuration is hidden in an
+   internal module. For now use [this
+   workaround](https://github.com/facebook/create-react-app/issues/10307#issuecomment-898889701) to create a
+   [start](https://github.com/Siegrift/master-thesis/blob/master/code/cra-app/scripts/start.js) and
+   [build](https://github.com/Siegrift/master-thesis/blob/master/code/cra-app/scripts/build.js) scripts to use instead.
+5. Trusted Types in Webpack do not propagate to webpack-dev-server which causes violations when there is an error in the
+   application source code (which also prevents the error to be shown). The workaround for now is to use a [custom build
+   of webpack-dev-server](https://github.com/Siegrift/webpack-dev-server) which uses Trusted Types policy internally.
+   You can clone that repository and enable this dependency via [yarn
+   resolutions](https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/) or [npm
+   overrides](https://docs.npmjs.com/cli/v8/configuring-npm/package-json#overrides). _(See our
+   [package.json](https://github.com/Siegrift/master-thesis/blob/master/code/cra-app/package.json) for details)_.
 
-```json
-// https://github.com/facebook/create-react-app/blob/5614c87bfbaae0ce52ac15aedd2cd0f91ffd420d/packages/react-scripts/config/webpack.config.js#L212
-trustedTypes: {
-  policyName: 'webpack-policy',
-},
-```
-
-But this is unreliable, since it will get erased on every `yarn install` and is not well scriptable since the
-node_modules hierarchy is not strictly defined.
-
-6. Gladly, editing webpack configuration is a very common problem and people already figured out workarounds, such as
-   this one: https://github.com/facebook/create-react-app/issues/10307#issuecomment-898889701
+_If you have troubles running this guide, try `rm -rf node_modules` and `yarn install`. If your problem persists let me
+know by opening an issue and I'll try to help you._
 
 # Getting Started with Create React App
 

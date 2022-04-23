@@ -37,3 +37,6 @@
 [submodule "code/solid-realworld"]
 	path = code/solid-realworld
 	url = git@github.com:Siegrift/solid-realworld.git
+[submodule "code/webpack-dev-server"]
+	path = code/webpack-dev-server
+	url = git@github.com:Siegrift/webpack-dev-server.git
