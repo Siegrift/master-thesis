@@ -110,9 +110,9 @@ releases of React manually.
 \subsection{Using Trusted Types compliant version of Webpack}
 
 CRA internally uses webpack 5 to provide convenient development features and transfrom and bundle
-application for production. Some of these features, especially hot module reload breaks under
-Trusted Types in enforcement mode. Gladly, webpack can be configured to be Trusted Types compliant
-by a small configuration change \cite{webpack_tt_config}.
+application for production. Some of these features cause Trusted Types violation. Gladly, webpack
+can be configured to be Trusted Types compliant by a small configuration change
+\cite{webpack_tt_config}.
 
 The problem with CRA is that the webpack configuration is hidden from the user. Unfortunately, there
 is no way how to override this configuration manually. This means that there is not a simple way how
@@ -120,8 +120,12 @@ to enable the Trusted Types integration. The workaround is to spy on imported Ja
 change their content. This pattern is often used when mocking or spying in unit tests. However,
 it is also a suitable solution for this case \cite{cra_modify_webpack_config}.
 
-CRA team is reluctant to provide a convenient way to edit or override the webpack configuration,
-since the provided defaults are good enough for the majority of users.
+Another issue we faced was caused by \emph{webpack-dev-server} which is only used in development and
+provides features like hot module reloading or showing error overlays. We found out that the error
+overlay widget is created via \emph{innerHTML} which causes a Trusted Types violation and prevents
+the error from being shown. The solution is to create a policy for the overlay widget and use a
+custom version of this dependency. Since Trusted Types are supported in Webpack we directly opened a
+Github issue \cite{tt_webpack_dev_server:issue} and proposed our solution.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Script to start React application with Trusted Types enabled in webpack]
