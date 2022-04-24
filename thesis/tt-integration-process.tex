@@ -4,44 +4,43 @@
 Integrating Trusted Types to applications and libraries might seem as a complex task that requires
 good knowledge of the project internals. There is a small sample of already implemented
 integrations, which shows that the necessary code changes are relatively small
-\cite{tt_integration_list}. Based on our experience, the integration does not require an exprteese
+\cite{tt_integration_list}. Based on our experience, the integration does not require an expertese
 of the projects inner workings neither. This experience is also supported by other integration
 authors \cite{tt_web_framework_paper}. Each integration is different, but on a high level they
-follow the same steps:
+follow the same principles:
 
 \begin{enumerate}
   \item Locate DOM sinks
-  \item Find the most suitable workaround for every sink found
-  \item Implement the integration and release a new version of the library
+  \item Find workaround for every sink found
+  \item Implement and release the integration
 \end{enumerate}
 
 \section{Locating DOM sinks}
 
-Locating the sinks of the integration library is important for scoping the integration effort and
-the implementation afterwards. This task is complex since there is no bulletproof way of locating
-all of the sinks in a codebase. This is because JavaScript is a dynamic language and it is possible
-to access and set the sink values dynamically using the property element access.
-
-Fortunately, there are a few methods and tools, which can help to catch most of the sinks:
+Locating the sinks in a framework is important for scoping the complexity and the implementation
+afterwards. This is a hard task since there is no bulletproof way of locating all of the sinks in a
+codebase, especially due to JavaScript being a dynamic language. Fortunately, there are a few
+methods and tools, which can help to catch most of the sinks:
 
 \begin{enumerate}
   \item Static search through the codebase
   \item Code analyzers
-  \item Using the library in an real world application
+  \item Testing the integration
 \end{enumerate}
 
 \subsection{Static search through the codebase}
 
-This method is the simplest one and the least effective. Statically searching for sinks throughout
-the codebase produces many false positives and also false negatives. The former are produced for
-read only sink usage, the latter when actual sinks are missed due to implementation limitations. The
-output of the static search is usually cluttered with less important violations in tests and built
-tools, which you need to manually exclude from the search.
+This method is the simplest one and the least effective. Statically searching for sinks in a
+codebase produces many false positives and false negatives. The former are produced for read only
+sink usage, the latter when the project contains sinks that are missed by the static search. This
+usually happens when the project using dynamic property access on HTML \emph{document} or
+\emph{element}. The output of the static search is usually cluttered with violations in tests and
+built tools, which you need to manually exclude from the search.
 
 Nevertheless, this method is easy to reason about, fast to iterate and the final search results can
 provide a good estimate of the integration scope. This works well in practice since there is an
-assumption that the target source code is not malicious and doesn't actively use code patterns which
-are trying to hide or cause an XSS vulnerability.
+assumption that the project developers are not malicious and do not use code patterns which are
+trying to hide or cause an XSS vulnerability.
 
 There is not an actively maintained static search tool for finding DOM sinks. However, it is
 relatively easy to build a script, which uses the existing tools such as \emph{grep} with a list
@@ -61,135 +60,141 @@ after the violations are fixed. For example, they can be run in CI pipeline or t
 leveraged by linters and other language plugin tools and the errors can be shown to the developers
 early on and directly in their IDE \cite{tsec_lsp}.
 
-\subsection{Using the target in a real world application}
+\subsection{Testing the integration}
 
 While static search through the codebase is fast and locates most of the sinks, it usually doesn't
-catch them all. If the integration target is a library, the integration author should verify the
-integration implementation on the applications using the target as a dependency. Also, having good
-test coverage in the target code greatly increases the chance that the integration is
-implemented correctly.
+find them all. The code analyzers have the suffer from the same problem. If the project is a library
+or a framework intended to be used by other applications, the integration should be thoroughly
+tested. The integration author should verify the integration implementation on a real world
+applications. This also helps ensuring the backwards compatibility with older versions.
 
-That said, finding a suitable application might be challenging and it may not be an ideal way to
-test all edge cases. For example, when implementing an integration to React, one can find lot of
-real world applications using React, but most of them are already XSS free so you can only verify if
-the integration doesn't break these clients.
+That said, finding a suitable application to test the Trusted Types integration can be challenging
+and it may not be an ideal way to test all edge cases. For example, when implementing an integration
+to React, one can find lot of real world applications using React, but most of them are already XSS
+free so you can only verify if the integration doesn't break these clients. For this reason it is
+also desirable to create an application from scratch to focus more on the integration edge cases.
 
-One recommendation for the clients are to use the the report only mode of Trusted Types CSP. This
-allows applications to migrate their code gradually and allows them to focus on application
-features.
+The recommendation for application authors is to use the the report only mode of Trusted Types. This
+enables gradual migration and allows them to work on application features in parallel.
 
-Library authors need to test how the integration works when used with applications that uses the
-DOM sinks and now has to produce Trusted Types values. These are done best by creating an
-application from scratch by the integration author.
-
-\section{Finding the most suitable workaround for every sink found}
+\section{Finding workaround for every sink found}
 
 In this section, we assume that all of the sinks discussed produce Trusted Types violations. Note,
 that a sink can produce a Trusted Types violation for a value that is provably secure. For example,
 this happens when a constant string is assigned to an innerHTML property of an DOM element.
-
 Generally, there are three ways how to resolve a Trusted Types violation produced by a sink:
 
 \begin{enumerate}
-  \item Refactor the code not to use the sink value
-  \item Wrap the value passed to the sink in a Trusted Types policy
-  \item Ensure Trusted value is not altered before reaching the sink
+  \item Find a safer alternative
+  \item Wrap the value in a Trusted Types policy
+  \item Ensure user supplied sink value is immutable
 \end{enumerate}
 
-\subsection{Refactor the code not to use the sink value}
+\subsection{Find a safer alternative}
 
-For some dangerous sinks, there is a safer alternative that can be used. For example, for non script
-elements, one can use `element.innerText` instead of `element.innerHTML`. Another way is to create
-DOM nodes manually and only append the generated elements to the target element as child.
+For some sinks, there exists a safer alternative API that can be used. For example, for non script
+elements, one can use \emph{Element.textContent} instead of \emph{element.innerHTML}. Developers use
+\emph{innerHTML} mostly because of legacy reasons, since \emph{textContent} is only availabe in IE
+from version 9 \cite{text_content_mdn}. However the support for this version has ended in January
+2016 and the support for latest IE 11 will end in June 2022 in favor of Microsoft Edge. Due to these
+reasons applications are encouraged to avoid this trick and drop the support for IE or at least IE
+9.
 
-This method is only available when there is a safer API alternative, which is often not the case and
-this solution is not applicable.
+Another use case \emph{innerHTML} property is to assign a constant string representing the HTML
+markup. This is done for convenience to create a small chunk of HTML that is displayed on a page.
+The alternative is to create DOM nodes dynamically and only append the generated elements to the
+target element as a child.
 
-\subsection{Wrap the value passed to the sink in a Trusted Types policy}
+Unfortunately, these workarounds can be applied only when there is a safer API alternative, which is
+often not the case and this solution is not applicable.
 
-When there is no way to avoid using the sink and the value is trusted, one has to use a Trusted
-Types policy to promote a trusted value to a Trusted Types instance. One should apply a Trusted
-Types policy where the trusted value is created, not where it is passed to a sink. For example, the
-author should promote a value to Trusted Type immediately after sanitization or escaping. This way
-the immutability of Trusted Types can preserve the "trust" independently of how the value flows
-through code until it reaches the sink.
+\subsection{Wrap the value in a Trusted Types policy}
 
-The easy part of this method is wrapping a value inside a policy, but if the application
-or library used to modify this value it now needs to be refactored to readonly usage of these values
+When there is no way to avoid using the sink and the value is trusted, developers can use a Trusted
+Types policy to promote a trusted value to a Trusted Types instance. One should apply a policy as
+soon as the value can be trusted. This usually means the place where the value is created. For
+example, the author should promote a value to Trusted Type immediately after sanitization or
+escaping. This way the unforgeability of Trusted Types can preserve the "trust" independently of how
+the value flows through code until it reaches the sink.
+
+After the value is converted to a Trusted Types instance, the application needs to make sure the
+value is not altered before it reaches the sink and no string functions are attempted
 (\ref{tt_integration_ensure_tt_not_altered}).
 
 \label{tt_integration_ensure_tt_not_altered}
-\subsection{Ensure Trusted value is not altered before reaching the sink}
+\subsection{Ensure user supplied sink value is immutable}
 
-As we mentioned, Trusted Types instances are immutable values. Previously the DOM sinks accepted a
-string values so the application or library might be used to call string operations on the value.
-Since the new values do not have string methods defined any attempt trying to call them will result
-in an error. Another problem is stringification which converts a Trusted Types instance to a string,
-which then throws an error when the value is passed to the sink.
+As we mentioned, Trusted Types instances are immutable and unforgeable values. Previously, the DOM
+sinks accepted string values so the application might have used string operations on the value, such
+as calling common string function. Since the new values do not have string methods defined, any call
+attempt results in an error. Another problem is stringification which converts a Trusted Types
+instance to a regular string, dropping the trust guarantees provided by Trusted Types, which then
+throws an error when the value is passed to the sink.
 
-The integration author needs to refactor the library or application to prevent modifying the
-Trusted values to preserve the trust guarantees secured by Trusted Types.
+The integration author needs to refactor the code to prevent modifying the trusted values to
+preserve the trust guarantees secured by Trusted Types.
 
 \section{Implementing and releasing the integration}
 
-Implementing the integration and releasing a new version of the target is undoubtedly an important part
-of Trusted Types integration. However, this can take long time for multiple reasons, which are
-described in separate sections:
+Implementing the integration and releasing a new version of the application or library is
+undoubtedly an important part of Trusted Types integration process. However, this can take a long
+time for multiple reasons. Some of them are described in separate sections below:
 
 \begin{enumerate}
   \item Reasoning about the integration
   \item Trusted Types compatibility in dependencies
-  \item Knowledge required for the integration author
+  \item Integration complexity
 \end{enumerate}
 
 \subsection{Reasoning about the integration}
 \label{sub:reason_about_integration}
 
 Proving that the integration is correct means to determine if all sinks have been located and
-properly addressed. This is generally infeasible or impossible to determine. Project usually look at
+properly addressed. This is generally infeasible or impossible to prove. Projects usually look at
 patches empirically. If the integration looks correct and is properly tested then it is safe to
 assume that the integration is indeed correct. This is especially true when the integration is
 tested by large scale organizations by lot of services.
 
-That being said, Trusted Types enforcement is a breaking change and project should make this change
-opt-in or release a new version with breaking changes \cite{dom_purify_major_version}. If the
-integration is turned on by default when Trusted Types are available in the browser, the target is
-risking breaking existing applications \cite{dom_purify_breakage}.
-
-Releasing an opt-in change might be problematic if the target is not configurable. This can result
-in the integration being put behind a feature flag which hurts the adoption
+That being said, Trusted Types enforcement is a breaking change for projects. Libraries which can
+conditionally create Trusted Types should make this change opt-in. If the integration is turned on
+by default when Trusted Types are available in the browser, the library is risking breaking the
+existing applications since they might expect the values to be string instances
+\cite{dom_purify_breakage}. When opt-in configuration is not possible, the library should release
+the integration as a breaking change with a new major version. The alternative is to put Trusted
+Types integration behind a feature flag. The downside is that this can hurt the adoption
 \cite{react_tt_feature_flag}.
 
 \subsection{Trusted Types compatibility in dependencies}
 \label{sub:tt_compatibility_in_deps}
 
-Implementing the integration in large projects, which consists of many dependencies can bring a lot
-of overhead, because to be fully Trusted Types compliant one must ensure that all of the
+Implementing the integration in large projects, which consist of many dependencies can bring a lot
+of overhead because to be fully Trusted Types compliant developers must ensure that all of the
 dependencies are Trusted Types complaint as well.
 
 When there is non compliant dependency, one has multiple options:
 
 \begin{itemize}
-  \item Implement the integration for the dependency -- This option leads to recursive integrations
-        and has all the problems already mentioned and can possible lead to many more integrations.
-  \item Find an alternative dependency -- This option is often impossible as a viable alternative
-        might not exist and projects might not want to use an alternative only because of Trusted
-        Types compliance.
-  \item Use Trusted Types default policy -- This option should only be used by end applications and
-        is more complex. The application is not fully Trusted Types compliant and it can also lead
-        to a reduced performance.
+  \item Implement the integration for the dependency -- This option leads to more integrations being
+        needed. Also, these dependencies might be reluctant to adopting Trusted Types and accepting
+        the integration.
+  \item Find an alternative dependency -- This option is often impossible because viable alternative
+        might not exist. Also, replacing a dependency with an alternative increases the integration
+        effort and projects might not want to migrate to an alternative dependency only because of
+        Trusted Types compliance.
+  \item Use Trusted Types default policy -- This option should only be used by applications and
+        implementing the default policy can is difficult. Moreover, the default policy brings a
+        cost, the application is not fully Trusted Types compliant and using default policy can
+        reduce application performance.
 \end{itemize}
 
-\subsection{Knowledge required for the integration author}
+\subsection{Integration complexity}
 \label{sub:trust_integration_author}
 
-The integration author can neither be a security engineer familiar with Trusted Types and neither a
-part of the engineering team of the target familiar with the target code. This means that the author
-might not be fully familiar with both of the technologies and the respective teams, which can result
-in both:
+Difficulty of Trusted Types integrations can vary. Some integrations may require minimal effort or
+no code changes at all. Some integrations can be more complex, for example the Angular integration
+\cite{tt_web_framework_paper}.
 
-\begin{itemize}
-  \item Increased propability of a bug in implementation
-  \item Harder and longer review, since the reviewers might also lack the information about Trusted
-        Types or simply ignore the PR due to other priorities
-\end{itemize}
+Especially in the open source world the author of the integration might be an external contributor
+who has limited knowledge about the project. Our experience suggests, that developers can implement
+integrations despite not being familiar with the project internals. That being said, the project
+might be reluctant to merging the integration due to the introduced complexity.
