@@ -1,4 +1,4 @@
-\chapter{Preprocessor integrations}
+\chapter{Integrations into preprocessors}
 
 It is very common for web applications to depend on multiple code preprocssing tools which can
 perform many different things. For example, one can consider TypeScript compiler a code preprocessor
@@ -49,7 +49,9 @@ The JSX was originally designed to simplify the syntax for React applications by
 HTML, JavaScript and CSS all in the same file. However, the specification \cite{jsx_spec} is
 generic and can be used for multiple use cases and not only strictly UI related.
 
-\subsection{Solid.js JSX preprocessor}
+\medskip
+\begin{flushleft}\textbf {Solid.js JSX preprocessor}\end{flushleft}
+\medskip
 \label{jsx_solid_preprocessor}
 
 One of these non React JSX use case is the JSX preprocessing inside solid.js framework
@@ -58,7 +60,7 @@ uses the JSX and supports native APIs which resemble the React hooks API. The im
 the translated JSX is very different under the hood. React translates the JSX to
 \text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
 The framework differences are not that important for this paper. However, both of them use Babel to
-transform the easier to more convenient JSX syntax to JavaScript compatible code. You can see the
+transform the easier to more convenient JSX syntax to JavaScript compatible code. See the
 transformation in action in the code listings below (generated using Solid.js playground
 \cite{solidjs_playground}).
 
@@ -112,10 +114,10 @@ export { Counter };
 The transformed Solid.js code uses \text{template} function (imported from \emph{solid-js/web}).
 This function internally uses \emph{HTMLTemplateElement.innerHTML} property when creating the
 template. This triggers a Trusted Types violation when the code is executed in the browser. The
-solution is to create a Trusted Types policy wrapping the content assigned to innerHTML property.
-This is secure, because the JSX transformation only creates the templates from statically known
-HTML. All dynamic and interpolated markup is rendered using JavaScript without using any dangerous
-sinks.
+solution is to create a Trusted Types policy wrapping the content assigned to \emph{innerHTML}
+property. This is secure, because the JSX transformation only creates the templates from statically
+known HTML. All dynamic and interpolated markup is rendered using JavaScript without using any
+dangerous sinks.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Examples of JSX transformations]
@@ -169,7 +171,9 @@ Fortunately, Trusted Types are already supported in Webpack (starting from versi
 most used bundler at time of writing. However, there are some new promising ones which provide
 better performance or use ES modules which leads to simpler architecture and more performant design.
 
-\subsection{Vite}
+\medskip
+\begin{flushleft}\textbf {Vite}\end{flushleft}
+\medskip
 
 Vite is one of the modern bundlers which serves the source files via native ES modules which have
 many built in features and extremely fast and reliable hot module replacement (HMR) for development.
@@ -189,7 +193,7 @@ three places which cause Trusted Types violations. These can be categorized into
         violation, but works for CSS stylesheet creation.
 
         \bigskip
-        \begin{lstlisting}[language=JavaScript, caption=Creation of style elements using innerHTML in Vite \cite{commit_vite_inner_html_styles}]
+        \begin{lstlisting}[language=JavaScript, caption=Creation of style elements using \emph{innerHTML} in Vite \cite{commit_vite_inner_html_styles}]
 if (!style) {
   style = document.createElement('style')
   style.setAttribute('type', 'text/css')
@@ -212,7 +216,7 @@ if (!style) {
         string constants via template literals, but this is not yet supported.
 
         \bigskip
-        \begin{lstlisting}[language=JavaScript, caption=Creation of error overlay using innerHTML property \cite{commit_vite_inner_html_overlay}]
+        \begin{lstlisting}[language=JavaScript, caption=Creation of error overlay using \emph{innerHTML} property \cite{commit_vite_inner_html_overlay}]
 export class ErrorOverlay extends HTMLElement {
   root: ShadowRoot
 

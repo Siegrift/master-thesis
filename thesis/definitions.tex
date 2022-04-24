@@ -15,9 +15,9 @@
         page.
   \item \label{def:dom_source_sink} \textbf{DOM source and sink} -- In the context of XSS, a DOM
         source is the location from which untrusted data is taken by the application and passed on
-        to the sink, for example \emph{location} or \emph{cookies}. DOM Sinks are the places where
+        to the sink, for example \emph{location} or \emph{cookies}. DOM sinks are the places where
         untrusted data coming from the sources is actually getting executed resulting in DOM XSS,
-        for example \emph{eval} or \emph{Element.innerHTML}. \cite{source_sink_definition}. We might
+        for example \emph{eval} or \emph{Element.innerHTML} \cite{source_sink_definition}. We might
         also refer to a sink as an \emph{injection sink}, because the untrusted value is injected
         into the sink by the attacker.
   \item \label{def:spa} \textbf{SPA} -- SPA stands for \emph{Single Page Applications} and it
@@ -26,10 +26,11 @@
   \item \label{def:ts} \textbf{TypeScript} -- TypeScript is a strict syntactical superset of
         JavaScript and adds optional static typing to the language. It is designed for the
         development of large applications and transpiles to JavaScript.
-  \item \label{def:hot_reload} \textbf{Hot module reload} -- The concept of a \emph{hot module
-          reload (HMR)} is that the running application running in development mode is automatically
-        restarted after code changes are made. The former restarts the whole app, the latter only
-        patches the running application with code changed and preserves the application state.
+  \item \label{def:hot_reload} \textbf{Hot reload} -- The concept of a \emph{hot reload} is that the
+        running application running in development mode is automatically restarted after code
+        changes are made. There is also a related concept called \emph{Hot Module Replacement
+          (HMR)}. The former restarts the whole app, the latter only patches the running application
+        with code changed and preserves the application state.
   \item \label{def:npm} \textbf{npm} -- \emph{npm} is a package manager for the JavaScript
         language and JavaScript runtime environment Node.js.
 \end{enumerate}

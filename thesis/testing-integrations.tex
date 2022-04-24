@@ -1,4 +1,4 @@
-\chapter{Testing frameworks integrations}
+\chapter{Integrations into testing frameworks}
 
 
 Trusted Types are agnostic to the testing framework used and the type of tests. It is very common
@@ -21,12 +21,12 @@ nuances the developer has to overcome to be able to test the application and Tru
 violations. For this reason, we created a Cypress plugin which abstracts the low level details
 and provides a nicer API for the developers to use.
 
-\subsection{Removed CSP header}
+\subsection{Applying the CSP header}
 
 Cypress removes the CSP header sent by the application server in order to load the application in an
-iframe, which could otherwise be prevented by a \emph{scriptSrc} CSP directive. There is a
+\emph{iframe}, which could otherwise be prevented by a \emph{scriptSrc} CSP directive. There is a
 workaround for now, which is to intercept the request of the initial HTML application payload and
-copy the CSP policy from the response headers to the response body inside a \emph{meta} tag.
+copy the CSP policy from the response headers to the response body inside an HTML meta tag.
 \cite{cypress:csp_removal_issue}.
 
 This is tedious for the developers, so we created a custom command in our plugin which does

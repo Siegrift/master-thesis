@@ -23,7 +23,7 @@ under which Trusted Types operate.
         malicious script is reflected off of a web application to the victim's browser
         \cite{reflected_xss}.
   \item  DOM based -- The vulnerability appears in the DOM (\ref{def:dom}) by executing a malicious
-        code. In reflected and stored XSS attacks you can see the vulnerability payload in the
+        code. In reflected and stored XSS attacks one can see the vulnerability payload in the
         server response. However in a DOM based XSS, the attack payload is executed as a result of
         modifying the DOM environment in the victim's browser so that the client side code runs in
         an unexpected manner.
@@ -79,8 +79,8 @@ https://example.com?<img%20src=x%20onerror="alert(1)"></img>
 
 The consequences of XSS vary a lot. Their severity can range from benign annoyances to unrecoverable
 damages such as full account compromise, disclosure of user's cookies, storage, secrets or session.
-Other attacks may use XSS to change the application content and present fraudulent information to the
-user.
+Other attacks may use XSS to change the application content and present fraudulent information to
+the user.
 
 There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
 former usually suffer from performance and scalability issues when applied on large codebases while
@@ -114,7 +114,7 @@ Trusted Types is a powerful API. Its main goals are to \cite{tt_spec:goals}:
   \item reduce the risk of client side vulnerabilities caused by injection sinks.
   \item replace the insecure by default APIs with safer alternatives which are harder to misuse.
   \item encourage a design where the code affecting the application security is encapsulated in a
-        small part of an application.
+        small parts of an application.
   \item reduce the security review surface for applications and libraries.
 \end{itemize}
 
@@ -128,7 +128,7 @@ measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:no
         both client and server can be really complex, especially for applications where parts of the
         code can run on both client and server, for example as in Next.js (\ref{intro-nextjs}). To
         address these attacks, use the existing recommended solutions like templating systems or CSP
-        \emph{script-src}.
+        \emph{script-src} directive.
   \item controling subresource loading -- Trusted Types deal with code running in realm of the
         current document and does not guard subresources.
   \item guarding cross origin JavaScript execution, for example loading new documents via
@@ -173,12 +173,11 @@ Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicat
 
 These directives together enable and configure Trusted Types behaviour for the particular web
 application. They allow the application authors to define rules guarding write access to the DOM
-sinks and thus reducing the DOM XSS attack surface to small, isolated parts of the web application.
-This smaller parts can be modularized where they can be more easily monitored, reviewed and
-maintained.
+sinks and thus reducing the DOM XSS attack surface to small parts of the web application. These
+smaller parts can be modularized where they can be more easily monitored, reviewed and maintained.
 
 Apart from the standard \emph{Content-Security-Policy} header there is also
-\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in report
+\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in a report
 only mode. Trusted Types violations are only interpreted as warnings in this mode. This way the
 application can gradually work on Trusted Types compliance without breaking the existing users. It
 is also recommended to use the report only mode in production for some time to make sure the
@@ -219,10 +218,11 @@ const trustedHtml = myPolicy.createHTML("<span>safe html</span>");
 The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using the callback
 functions. This callback function is called when the policy is used to create a trusted value. It
 receives the sink value of a string type as an argument and returns a string value that should be
-XSS free and thus can be trusted. In practice, this function may be implemented as identity if the
-payload is known to be trusted. Another good example would be to sanitize the sink value inside this
-callback. In case the payload should not be used or can not be sanitized, you can return
-\emph{null} or \emph{undefined} which will trigger a Trusted Types violation.
+XSS free and thus can be trusted. In practice, this function may be implemented as \emph{identity
+  function} if the payload is known to be trusted. Another examples of policy callback implementation
+would be to sanitize the sink value or perform certain whitelist logic. In case the payload should
+not be used or can not be sanitized, the function should return \emph{null} or \emph{undefined}
+which will trigger a Trusted Types violation.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
@@ -333,10 +333,10 @@ security properties as in the browsers where they are supported \cite{xss_nowher
 There are multiple variants of the polyfill:
 
 \begin{itemize}
-  \item Full -- Creates the API of Trusted Types, parses the \emph{meta} tag from the HTML and
-        enables the enforcement in the DOM.
-  \item API only -- Creates the API of Trusted Types so you can use policies and create trusted
-        values, but no enforcement rules are applied.
+  \item Full -- Creates the API of Trusted Types, parses the HTML meta tag from the web page
+        and enables the enforcement in the DOM.
+  \item API only -- Creates the API of Trusted Types so the application can use policies and create
+        trusted values. However, no enforcement rules are applied.
   \item Tiny -- Polyfills only the most important part of the API surface with a single line of code
         for a minimal bundle size.
 \end{itemize}
