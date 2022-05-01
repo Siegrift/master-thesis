@@ -208,7 +208,7 @@ captionpos=b
 {\bf Acknowledgments: } I want to thank everyone who motivated me to finish the studies and the
 support when I was struggling. Thank you K. Kotowicz and P. Borovanský for all the help and
 friendliness. I thank "MatFyz" because it is just the perfect school. Lastly, greatest thanks to my
-family and girlfriend Jitka for everything they've done for me. This thesis is devoted to my Mom,
+family and girlfriend Jitka for everything they have done for me. This thesis is devoted to my Mom,
 who would be very happy for me to have a degree.
 
 % --- Koniec poďakovania
@@ -220,14 +220,16 @@ who would be very happy for me to have a degree.
 \section*{Abstrakt}
 
 Trusted Types je moderná webová knižnica, ktorá má za cieľ zredukovať riziko DOM XSS zraniteľností
-vo webových aplikáciách. Táto knižnica poskytuje nástroje a umožňuje implementáciu aplikácií bez DOM
-XSS zraniteľností vďaka obmedzeniu prístupu k nebezpečným funkciám a atribútom voľne dostupných v
-DOM. V súčasnosti je knižnica podporovaná v prehliadačoch Chrome, Edge a Opera.
+vo webových aplikáciách. Integrácia knižnice Trusted Types do webových aplikácií a knižníc vyžaduje
+zmeny v kóde. Obrovský problém nastáva, keď tieto zmeny musia byť implementované v kóde tretích
+strán, ku ktorému nemá autor prístup.
 
-Integrácia knižnice Trusted Types do webových aplikácií a knižníc vyžaduje zmeny v kóde. Obrovský
-problém nastáva, keď tieto zmeny musia byť implementované v kóde tretích strán, ku ktorému nemá
-autor prístup. Trusted Types podpora vo voľne dostupných knižniciach postupne stúpa a naším plánom
-je analyzovať existujúce integrácie a implementovať jednu alebo viac náročných integrácií.
+Trusted Types podpora vo voľne dostupných knižniciach postupne stúpa a naším cieľom je analyzovať
+niektoré tieto integrácie a implementovať nové. Najprv v práci popisujeme ako proces integrácie
+funguje vo všeobecnosti. Potom implementujeme viaceré integrácie rôznej obtiažnosti do knižníc
+rôznych veľkostí. Naše výsledky ukazujú, že pomocou našich integrácií sa dajú vyvíjať, testovať a
+nasadzovať aplikácie, ktoré využívajú knižnicu Trusted Types. Tieto výsledky demonštrujeme na
+skutočnej aplikácii menšieho rozsahu.
 
 \paragraph*{Kľúčové slová: Trusted Types, Web APIs}
 % --- Koniec Abstrakt - Slovensky
@@ -240,13 +242,16 @@ je analyzovať existujúce integrácie a implementovať jednu alebo viac nároč
 \section*{Abstract}
 
 Trusted Types is a modern Web API which aims to reduce DOM XSS attack surface in web applications.
-They give you the tools to write and maintain applications free of DOM XSS vulnerabilities by making
-the dangerous web API secure by default. Currently, they are supported in Chrome, Edge and Opera.
-
 Integrating Trusted Types in web applications and libraries requires code changes. The major problem
-is when these changes need to be made in third party code which you do not have access to and you
-can not easily modify. Trusted Types support in open source projects is gradually improving and our
-plan is to analyze these integrations and implement one or more of the challenging ones.
+is when these changes need to be made in third party code which the developer does not have access
+to.
+
+Trusted Types support in open source projects is gradually improving and our plan is to analyze some
+of these integrations and implement new ones. We first describe how the integration process works in
+general. We then implement multiple integrations into different libraries of various complexities.
+Our results show that it is possible to develop, test and release applications with Trusted Types
+enforcement enabled using the integrations we implemented. We demonstate this on a smaller sized
+real world application.
 
 \paragraph*{Keywords: Trusted Types, Web APIs}
 
