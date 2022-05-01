@@ -10,10 +10,9 @@ mitigate these vulnerabilities. Lastly, we describe the motivation and backgroun
 
 Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
 of web applications taking untrusted user input and interpreting it as code without sanitization or
-escaping. There are multiple categories of XSS. Most experts distinguish at least between
-non persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
-category, DOM based XSS, which will be explained in more depth as this is the threat model
-under which Trusted Types operate.
+escaping. There are multiple categories of XSS. Most experts distinguish at least between non
+persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third category,
+DOM based XSS, which will be explained in more depth as this is a variant that Trusted Types target.
 
 \begin{itemize}
   \item  Stored -- A malicious injected script is permanently saved in a server database. The client
@@ -94,9 +93,9 @@ mitigating XSS \cite{tt_design_history}. It is currently supported in Chrome, Ed
 
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
 XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
-directly in the web browser. They are delivered through a CSP header and have a report only mode
-that does not change the application behavior and an enforcement mode that may cause user observable
-breakages \cite{tt_background}.
+for potentially user controlled and malicious values. They are delivered through a CSP header and
+have a report only mode that does not change the application behavior and an enforcement mode that
+may cause user observable breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks from being called with values that have
 not passed through a Trusted Types policy \cite{tt_background}. If an untrusted value is passed to
@@ -353,10 +352,10 @@ pressure for framework authors to migrate to Trusted Types because there is not 
 However, there is not enough usage because a lot of applications are prevented to migrate because
 their dependencies do not work with Trusted Types.
 
-There is a point of view conflict between security engineers and software developers, the former
-focus on security, the latter on the application features. Trusted Types bridge this gap by
-providing secure by default software. The ideal scenario would be if the open source libraries used
-Trusted Types transparently to the application authors.
+Security engineers and software developers have often different priorities, the former focus on
+security, the latter on the application features. Trusted Types bridge this gap by providing secure
+by default software. The ideal scenario would be if the open source libraries used Trusted Types
+transparently to the application authors.
 
 In this paper we try to analyze some of the most popular open source frameworks and libraries and
 show that there are workarounds for projects to use Trusted Types without too much difficulties. We

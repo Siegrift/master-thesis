@@ -35,12 +35,12 @@ methods and tools, which can help to catch most of the sinks:
 
 \subsection{Static search}
 
-This method is the simplest one and the least effective. Statically searching for sinks in a
-codebase produces many false positives and false negatives. The former are produced for read only
-sink usage, the latter when the project contains sinks that are missed by the static search. This
-usually happens when the project using dynamic property access on HTML document or element. The
-output of the static search is usually cluttered with violations in tests and built tools, which
-need to be manually excluded from the search.
+This method is one of the simplest ones. Statically searching for sinks in a codebase produces many
+false positives and false negatives. The former are produced for read only sink usage, the latter
+when the project contains sinks that are missed by the static search. This usually happens when the
+project using dynamic property access on HTML document or element. The output of the static search
+is usually cluttered with violations in tests and built tools, which need to be manually excluded
+from the search.
 
 Nevertheless, this method is easy to reason about, fast to iterate and the final search results can
 provide a good estimate of the integration scope. This works well in practice since there is an
@@ -123,6 +123,10 @@ soon as the value can be trusted. This usually means the place where the value i
 example, the author should promote a value to Trusted Type immediately after sanitization or
 escaping. This way the unforgeability of Trusted Types can preserve the "trust" independently of how
 the value flows through code until it reaches the sink.
+
+In the future, Trusted Types API might provide support for constructing trusted values from string
+constants via template literals without using a policy, but this is not yet supported
+\cite{tt_from_literal_method}.
 
 After the value is converted to a Trusted Types instance, the application needs to make sure the
 value is not altered before it reaches the sink and no string functions are attempted
