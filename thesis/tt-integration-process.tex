@@ -62,7 +62,7 @@ early on and directly in their IDE \cite{tsec_lsp}.
 
 \subsection{Runtime analysis}
 
-While static search through the codebase is fast and locates most of the sinks, it usually doesn't
+While static search through the codebase is fast and locates most of the sinks, it usually does not
 find them all. The code analyzers have the suffer from the same problem. If the project is a library
 or a framework intended to be used by other applications, the integration should be thoroughly
 tested. The integration author should verify the integration implementation on a real world
@@ -71,7 +71,7 @@ applications. This also helps ensuring the backwards compatibility with older ve
 That said, finding a suitable application to test the Trusted Types integration can be challenging
 and it may not be an ideal way to test all edge cases. For example, when implementing an integration
 to React, one can find lot of real world applications using React, but most of them are already XSS
-free so they can be used only to verify if the integration doesn't break these clients. For this
+free so they can be used only to verify if the integration does not break these clients. For this
 reason it is also desirable to create an application from scratch to focus more on the integration
 edge cases. Another benefit to creating a custom application is that many violations are found more
 easily through runtime analysis. We recommend doing this for all integrations.

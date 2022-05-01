@@ -308,7 +308,7 @@ Looking for the callers of the function can be difficult because of the dynamic 
 JavaScript. Also, JavaScript is a mutable language which makes it harder to reason about function
 calls, especially the third party ones.
 
-When the application enforces Trusted Types, the engineer doesn't have to care about the dangerous
+When the application enforces Trusted Types, the engineer does not have to care about the dangerous
 functions and its callers. The focus of the security review shifts to reasoning about the creation
 of trusted values and policies. Once a trusted value is created, it is immutable and the policy
 which created it provides the security guarantees. When a trusted value reaches a sink, this
@@ -347,11 +347,11 @@ Trusted Types provide opportunity to significantly reduce the risk of a client s
 proven in various projects of various scale \cite{tt_web_framework_paper}
 \cite{tt_integration_list}. However, projects need to refactor parts of their code, which can be
 difficult, especially in the open source world where the software is composed by multiple
-dependencies which can't easily be modified. This presents a large barrier in Trusted Types adoption
-\cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough pressure for
-framework authors to migrate to Trusted Types because there is not is not enough usage. However,
-there is not enough usage because a lot of applications are prevented to migrate because their
-dependencies do not work with Trusted Types.
+dependencies which can not easily be modified. This presents a large barrier in Trusted Types
+adoption \cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough
+pressure for framework authors to migrate to Trusted Types because there is not is not enough usage.
+However, there is not enough usage because a lot of applications are prevented to migrate because
+their dependencies do not work with Trusted Types.
 
 There is a point of view conflict between security engineers and software developers, the former
 focus on security, the latter on the application features. Trusted Types bridge this gap by

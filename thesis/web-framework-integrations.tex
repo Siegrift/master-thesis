@@ -129,7 +129,8 @@ provides features like hot module replacement or showing error overlays. We foun
 overlay widget is created via \emph{innerHTML} which causes a Trusted Types violation and prevents
 the error from being shown. The solution is to create a policy for the overlay widget and use a
 custom version of this dependency. Since Trusted Types are supported in Webpack we directly opened a
-Github issue \cite{tt_webpack_dev_server:issue} and proposed our solution.
+Github issue \cite{tt_webpack_dev_server:issue} and proposed our solution
+\cite{tt_webpack_dev_server:pr}.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Script to start React application with Trusted Types enabled in webpack]
