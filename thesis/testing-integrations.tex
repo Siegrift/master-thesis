@@ -15,9 +15,9 @@ environment and test the application features from the user perspective.
 
 Cypress is one of the most popular frameworks for end-to-end testing of web applications
 \cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
-tests in real browsers and is fast and reliable due to its unique architecture. Developers can test
-Trusted Types compliant applications in Cypress out of the box because most of the Cypress commands
-only query the DOM which does not produce Trusted Types violations.
+tests in real browsers. Developers can test Trusted Types compliant applications in Cypress out of
+the box because most of the Cypress commands only query the DOM which does not produce Trusted Types
+violations.
 
 Even though Cypress supports Trusted Types out of the box, there are a few nuances the developer has
 to overcome to be able to test the application and Trusted Types violations. For this reason, we
@@ -70,17 +70,23 @@ to \emph{uncaught:exception} handler from Cypress and explicitly recognize a Tru
 violation based on the error thrown and tell Cypress that this error is intended so it does not fail
 the test.
 
+% Add space to the options start on a new page
+\vspace{25mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Test Trusted Types support, label={lst:cypress_test_tt_support}]
 it('supports TT', () => {
   expect(window.trustedTypes).not.to.be.undefined;
 });
 \end{lstlisting}
+% To make the page look a bit bigger
+\vspace{3mm}
 
 To simplify this low-level handling for the developers we created a custom command which recognizes
 Trusted Types violations and remembers them for the lifetime of the current test so they can be
 asserted later on.
 
+% To make the page look a bit bigger
+\vspace{3mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Custom command to catch Trusted Types violations]
 Cypress.Commands.add('catchTrustedTypesViolations', () => {
@@ -103,10 +109,15 @@ Cypress.Commands.add('catchTrustedTypesViolations', () => {
   });
 });
 \end{lstlisting}
+% To make the page look a bit bigger
+\vspace{3mm}
 
 The final part of the plugin is the API to assert the caught violations. There are multiple commands
 which assert that certain types of violations happened. An example of a full Cypress test which
 asserts the violation is listed in (\ref{lst:cypress_test}).
+
+% Add space to the options start on a new page
+\vspace{50mm}
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Example Trusted Types violation test, label={lst:cypress_test}]

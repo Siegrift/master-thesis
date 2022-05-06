@@ -164,7 +164,7 @@ when the component renders and is not part of the generated template calls.
 \section{Bundlers}
 
 Bundlers deal with many different tasks such as code minification and obfuscation, loading different
-file types, bundling the source files into big chunks, hot reloading in development, and more.
+file types, bundling the source files into big chunks, hot reloading in development and more.
 
 Many of the bundler responsibilities are Trusted Types compliant out of the box. However, many of
 the development only features break when Trusted Types are enforced. Usually, bundlers include a
@@ -174,15 +174,16 @@ displaying error details in an overlay widget.
 
 Fortunately, Trusted Types are already supported in Webpack (starting from version 5), which is the
 most used bundler at the time of writing. However, there are some new promising ones that provide
-better performance or use ES modules which leads to simpler architecture and more performant design.
+better performance or use ES modules which leads to simpler architecture and a more performant
+design.
 
 \medskip
 \begin{flushleft}\textbf {Vite}\end{flushleft}
 \medskip
 
 Vite is one of the modern bundlers which serves the source files via native ES modules which have
-many built-in features and extremely fast and reliable hot module replacement (HMR) for development.
-It also provides a simple way to bundle production code using another common bundler called Rollup.
+many built-in features and extremely fast hot module replacement (HMR) for development. It also
+provides a simple way to bundle production code using another common bundler called Rollup.
 
 Vite is a preferred bundler for creating applications using the Solid.js framework. To support the
 development of these applications, we needed to create a Trusted Types integration for Vite.
@@ -193,8 +194,7 @@ identified three places that cause Trusted Types violations. These can be catego
 \begin{itemize}
   \item Creation of style elements -- Internally, Vite used \emph{innerHTML} of an HTML style
         element to apply styles to the DOM. These two occurrences can be replaced with a
-        safer alternative using \emph{textContent} which does not trigger a Trusted Types
-        violation but works for CSS stylesheet creation.
+        safe \emph{textContent} property.
 
         \bigskip
         \begin{lstlisting}[language=JavaScript, caption=Creation of style elements using \emph{innerHTML} in Vite \cite{commit_vite_inner_html_styles}]

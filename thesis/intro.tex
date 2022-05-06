@@ -3,7 +3,7 @@
 
 In this chapter we give a brief overview of cross-site scripting (XSS), which is one of the most
 common web application vulnerabilities. We mainly focus on DOM-based XSS for which Trusted Types are
-the most effective. We then explain the design of Trusted Types and how it helps to detect and
+the most effective. We then explain the design of Trusted Types, how it helps to detect, and
 mitigate these vulnerabilities. Lastly, we describe the motivation and background for our work.
 
 \section{Cross-site scripting}
@@ -30,11 +30,10 @@ Types target.
 \end{itemize}
 
 Cross-site scripting vulnerability became more widespread with the boom of single-page applications
-(SPA) (\ref{def:spa}), where most of the behavior is achieved by modifying the DOM using
-JavaScript. There are many functions, element attributes, and properties in the DOM API which
-interpret the arguments as an executable code. We call these DOM sinks (\ref{def:dom_source_sink}).
-These sinks make it easy for developers to accidentally introduce this vulnerability
-\cite{tt_web_framework_paper}.
+(\ref{def:spa}), where most of the behavior is achieved by modifying the DOM using JavaScript. There
+are many functions, element attributes, and properties in the DOM API which interpret the arguments
+as an executable code. We call these DOM sinks (\ref{def:dom_source_sink}). These sinks make it easy
+for developers to accidentally introduce this vulnerability \cite{tt_web_framework_paper}.
 
 \bigskip
 \begin{lstlisting}[language={}, caption=Common DOM XSS sinks \cite{dom_xss_portswigger} \cite{tt_web_framework_paper}]
@@ -57,6 +56,9 @@ Worker()
 One of the most basic examples of XSS is the interpolation of URL parameters in the DOM. The
 attacker can prepare a malicious URL which they then send to a victim. The victim executes the
 payload just by navigating to the site sent by the attacker.
+
+% Add space to ensure code is not split between two pages
+\vspace{60mm}
 
 \bigskip
 \begin{lstlisting}[language=HTML, caption=Basic example of XSS via unsafe URL parameter interpolation]
@@ -90,21 +92,19 @@ the latter provides suboptimal results due to JavaScript's dynamic nature
 \section{Trusted Types}
 
 Trusted Types is a relatively modern web API designed by Google based on a long history of
-mitigating XSS \cite{tt_design_history}. It is currently supported in Chrome, Edge, and Opera.
+mitigating XSS \cite{tt_design_history}. They are currently supported in Chrome, Edge, and Opera.
 
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
-XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
-for potentially user-controlled and malicious values. They are delivered through a CSP header and
-have a report-only mode that does not change the application behavior and an enforcement mode that
-may cause user observable breakages \cite{tt_background}.
+XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks at
+potentially user-controlled and malicious values. They are delivered through a CSP header and have a
+report-only mode that does not change the application behavior and an enforcement mode that may
+cause user observable breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks from being called with values that have
 not passed through a Trusted Types policy \cite{tt_background}. If an untrusted value is passed to
 sink a Trusted Types violation is raised and the DOM is unaffected. In practice, this means that a
-potential DOM XSS has been prevented.
-
-There are many other resources that can be used to explore Trusted Types in detail
-\cite{tt_resources}.
+potential DOM XSS has been prevented. There are many other resources that can be used to explore
+Trusted Types in detail \cite{tt_resources}.
 
 \subsection{Threat model}
 
@@ -130,12 +130,12 @@ measures are needed. Some of the non-goals of Trusted Types are \cite{tt_spec:no
         address these attacks, use the existing recommended solutions like templating systems or CSP
         \emph{script-src} directive.
   \item controling subresource loading -- Trusted Types deal with code running in realm of the
-        current document and does not guard subresources.
+        current document and do not guard subresources.
   \item guarding cross-origin JavaScript execution, for example, loading new documents via
         \emph{data:} URLs -- Trusted Types do not guard cross-origin executions at all
   \item protecting against malicious developers of the web application -- It is implicitly assumed
         that untrusted developer can cause more severe damages. Attempting to guard against
-        malicious developer would lead to complex and impractical design.
+        malicious developer would lead to more complex and impractical design.
 \end{itemize}
 
 \subsection{Content Security Policy}
@@ -146,7 +146,7 @@ certain types of attacks, including XSS and data injection attacks \cite{mdn_csp
 a way for browsers to create safer APIs in a backward compatible manner since the API has to be
 opted in explicitly by the application server by sending the CSP response header or using the CSP
 inside the HTML meta tag in the response body. If the browser does not support the CSP directive,
-the directive is ignored and standard browser behavior applies.
+the directive is ignored and the standard browser behavior applies.
 
 Trusted Types are enabled through a CSP using two different directives:
 
@@ -154,6 +154,8 @@ Trusted Types are enabled through a CSP using two different directives:
   \item \emph{require-trusted-types-for} -- This directive instructs user agents to control the
         data passed to DOM XSS sink functions (\cite{mdn:require-trusted-types-for}).
 
+        % Add space to ensure there is no blank page in introduction
+        \vspace{5mm}
         \bigskip
         % NOTE: To remove vertical space when using listing without caption \begin{lstlisting}[language={}, belowskip=-1.2 \baselineskip]
         \begin{lstlisting}[language={}, caption=Syntax of \emph{require-trusted-types-for directive}]
@@ -168,8 +170,10 @@ Content-Security-Policy: trusted-types;
 Content-Security-Policy: trusted-types 'none';
 Content-Security-Policy: trusted-types <policyName>;
 Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicates';\end{lstlisting}
-
 \end{itemize}
+
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 
 These directives together enable and configure Trusted Types behavior for the particular web
 application. They allow the application authors to define rules guarding write access to the DOM
@@ -178,7 +182,7 @@ smaller parts can be modularized where they can be more easily monitored, review
 
 Apart from the standard \emph{Content-Security-Policy} header, there is also
 \emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in a
-report-only mode. Trusted Types violations are only interpreted as warnings in this mode. This way
+report-only mode. In this mode, Trusted Types violations are only interpreted as warnings. This way
 the application can gradually work on Trusted Types compliance without breaking the existing users.
 It is also recommended to use the report-only mode in production for some time to make sure the
 integration is working as expected \cite{tt_web_framework_paper}.
@@ -197,6 +201,8 @@ easily achieved by encapsulating a policy in its own module and exporting only v
 functions which use this policy internally. The values created from the policies are unforgeable and
 immutable, meaning there is no way for an attacker to pass a value to dangerous DOM APIs.
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creating a Trusted Types policy, label={lst:create_tt_policy}]
 const allowAll = (value) => value
@@ -215,6 +221,9 @@ const myPolicy = window.trustedTypes.createPolicy('my-policy', {
 const trustedHtml = myPolicy.createHTML("<span>safe html</span>");
 \end{lstlisting}
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
+
 The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using the callback
 functions. This callback function is called when the policy is used to create a trusted value. It
 receives a sink value of a string type as an argument and returns a string value that should be XSS
@@ -224,6 +233,8 @@ would be to sanitize a sink value or perform certain whitelist logic. In case th
 be used or can not be sanitized, the function should return \emph{null} or \emph{undefined} which
 will trigger a Trusted Types violation.
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
 const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
@@ -254,6 +265,8 @@ default policy allows malicious attacker payloads to reach the DOM sinks. Develo
 cautious when using the default policy and preferably use it only for a transitional period until
 the offending code is refactored not to use the dangerous DOM sinks \cite{tt_spec:default_policy}.
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creating a default policy \cite{tt_spec:default_policy}]
 trustedTypes.createPolicy('default', {
@@ -279,6 +292,8 @@ When focusing on client-side XSS, the engineer has to determine whether an appli
 dangerous DOM sinks, either implicitly or explicitly, and whether there is a way for an attacker to
 misuse them.
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Possibly dangerous function]
 function setHtml(element, html) {
@@ -291,6 +306,8 @@ safety of the function depends on the context of how it is used. More generally,
 function depends on both its direct and indirect callers, both present and future ones
 \cite{tt_design_history}.
 
+% Add space to ensure there is no blank page in introduction
+\vspace{5mm}
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Usage of the possibly dangerous function, label={lst:dangerous_fn_usage}]
   function processHtml(html) {
@@ -310,8 +327,8 @@ JavaScript. Also, JavaScript is a mutable language which makes it harder to reas
 calls, especially the third-party ones.
 
 When the application enforces Trusted Types, the engineer does not have to care about the dangerous
-functions and its callers. The focus of the security review shifts to reasoning about the creation
-of trusted values and policies. Once a trusted value is created, it is immutable and the policy
+functions, and its callers. The focus of the security review shifts to reasoning about the creation
+of trusted values, and policies. Once a trusted value is created, it is immutable and the policy
 which created it provides the security guarantees. When a trusted value reaches a sink, this
 guarantee still holds independently of how the value flew the callers. Consider the third-party call
 in the listing \ref{lst:dangerous_fn_usage} and assume \emph{data.html} contains a TrustedHTML
@@ -324,9 +341,9 @@ Trusted Types are currently supported in the Chromium family of browsers
 \cite{mdn:tt_compatibility}. Developers creating Trusted Types compliant applications should always
 check if Trusted Types API is available in the current execution context, which does not necessarily
 need to be a browser. It is very common for Node.js applications to pre-render the client-side code
-on the server to provide faster experience for the end users. This brings additional complexity and
-new attack vectors in the forms of reflected XSS, various kinds of injection, and more, which are
-out of Trusted Types scope.
+on the server to provide faster experience for the end users. This brings additional complexity, new
+attack vectors in the forms of reflected XSS, various kinds of injection and more, which are out of
+Trusted Types scope.
 
 An additional benefit of Trusted Types compliant applications is that all sinks are protected. The
 application can use a polyfill for browsers that do not support Trusted Types, maintaining the same
@@ -360,7 +377,7 @@ security, the latter on the application features. Trusted Types bridge this gap 
 by default software. The ideal scenario would be if the open-source libraries used Trusted Types
 transparently to the application authors.
 
-In this paper, we try to analyze some of the most popular open-source frameworks and libraries and
+In this paper, we try to analyze some of the most popular open-source frameworks and libraries to
 show that there are workarounds for projects to use Trusted Types without too many difficulties. We
 want to implement some integrations and an example application to encourage application and
 framework authors to adopt Trusted Types to eradicate DOM-based XSS.
