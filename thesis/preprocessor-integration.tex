@@ -1,47 +1,46 @@
 \chapter{Integrations into preprocessors}
 
-In this chapter we describe a large group of integrations, formally defined as preprocessors. The
-rest of the chapter explains our integrations. The first one is an JSX Babel plugin for Solid.js
-framework. The next one is a Vite integration to support development mode of applications. These are
-the two core integrations that provide the support for development of Trusted Types compliant
-applications in Solid.js framework.
+In this chapter, we describe a large group of integrations, formally defined as preprocessors. The
+rest of the chapter explains our integrations. The first one is a JSX Babel plugin for the Solid.js
+framework. The next one is a Vite integration to support the development mode of applications. These
+are the two core integrations that provide the support for the development of Trusted Types
+compliant applications in the Solid.js framework.
 
-It is very common for web applications to depend on multiple code preprocssing tools which can
-perform many different things. For example, one can consider TypeScript compiler a code preprocessor
-which compiles TypeScript code to JavaScript. One of the most notorious code preprocessors is Babel,
-which takes a modern JavaScript code and transpiles it into older versions that are then compatible
-with a wide range of browsers and their versions. However, the biggest group of code preprocessors
-are bundlers which simplify developer experience by providing advanced development features such as
-hot reloading, debugging and source map support.
+It is very common for web applications to depend on multiple preprocessing tools which can perform
+many different things. For example, one can consider the TypeScript compiler a code preprocessor
+that compiles TypeScript code to JavaScript. One of the most notorious code preprocessors is Babel,
+which takes a modern JavaScript code and transpiles it into an older versions that are then
+compatible with a wide range of browsers and their versions. However, the biggest group of code
+preprocessors are bundlers which simplify the developer experience by providing advanced development
+features such as hot reloading, debugging and source map support.
 
 These tools are essential for web application developers and are usually configured declaratively
 and abstracted away from the application authors. Unfortunately, these transformations might produce
-non Trusted Types compliant code. To achieve Trusted Types compliance in frameworks and
+code that is not Trusted Types compliant. To achieve Trusted Types compliance in frameworks and
 applications, one must ensure that the resulting code from preprocessing tools is Trusted Types
 compliant or implement the Trusted Types integration themselves.
 
-There are a lot of preprocessors which do not affect Trusted Type compliance of a code. It is hard
-to formally define this group, but these are usually the code transformations which do not change
-the semantics of the code. For example:
+There are a lot of preprocessors that do not affect the Trusted Type compliance of a code. It is
+hard to formally define this group, but these are usually the code transformations that do not
+change the semantics of the code. For example:
 
 \begin{itemize}
   \item TypeScript -- TypeScript (\ref{def:ts}) compiler transforms the TypeScript sources to
         equivalent code written in JavaScript by mostly removing the type annotations. Such
         transformation yields semantically equivalent code.
-  \item Transformation to older JavaScript standard -- One of the most common functionality of Babel
-        is to transpile code written in modern JavaScript language to older standard compatible with
+  \item Transformation to older JavaScript standards -- One of the functionalities of Babel is to
+        transpile code written in modern JavaScript language to older standards compatible with a
         wide range of browsers and browser versions. Many of these transformations are solved with
         polyfills or simple AST replacements but the code remains semantically the same.
-  \item Minification -- The purpose of the code minification is to reduce the
-        overall bundle size that needs to be sent by the server to the clients browser. In practice
-        this includes removing dead code, changing the names of the functions, shortening
-        expressions and statements, however the minified code is functionally equivalent to the non
-        minified one.
+  \item Minification -- The purpose of the code minification is to reduce the overall bundle size
+        that needs to be sent by the server to the clients' browsers. In practice, this includes
+        removing dead code, changing the names of the functions, shortening expressions and
+        statements, however, the minified code is functionally equivalent to the non-minified one.
 \end{itemize}
 
-There are many Trusted Types compliant preprocessors which work with Trusted Types out of the box.
-Unfortunately, there are also tools and preprocessors which produce non Trusted Types compliant code
-for which Trusted Types integration is needed.
+There are many Trusted Types compliant preprocessors that work with Trusted Types out of the box.
+Unfortunately, there are also tools and preprocessors which produce code that is not Trusted Types
+compliant. For these tools, a Trusted Types integration is needed.
 
 \section{Babel}
 
@@ -52,7 +51,7 @@ transform the JSX markup into standard JavaScript. These preprocessors provide t
 on its own does not have.
 
 The JSX was originally designed to simplify the syntax for React applications by allowing mixing
-HTML, JavaScript and CSS all in the same file. However, the specification \cite{jsx_spec} is
+HTML, JavaScript, and CSS all in the same file. However, the specification \cite{jsx_spec} is
 generic and can be used for multiple use cases and not only strictly UI related.
 
 \medskip
@@ -60,13 +59,13 @@ generic and can be used for multiple use cases and not only strictly UI related.
 \medskip
 \label{jsx_solid_preprocessor}
 
-One of these non React JSX use case is the JSX preprocessing inside solid.js framework
-(\ref{section:solid}). This framework on the surface looks like React as it is component oriented,
-uses the JSX and supports native APIs which resemble the React hooks API. The important fact is that
+One of the JSX use cases is the JSX preprocessing inside the Solid.js framework
+(\ref{section:solid}). This framework on the surface looks like React as it is component-oriented,
+uses the JSX, and supports native APIs which resemble the React hooks API. The important fact is that
 the translated JSX is very different under the hood. React translates the JSX to
 \text{React.createElement} calls but Solid.js translates the JSX markup to native HTML templates.
 The framework differences are not that important for this paper. However, both of them use Babel to
-transform the easier to more convenient JSX syntax to JavaScript compatible code. See the
+transform the easier to more convenient JSX syntax into JavaScript compatible code. See the
 transformation in action in the code listings below (generated using Solid.js playground
 \cite{solidjs_playground}).
 
@@ -117,11 +116,11 @@ delegateEvents(["click"]);
 export { Counter };
 \end{lstlisting}
 
-The transformed Solid.js code uses \text{template} function (imported from \emph{solid-js/web}).
-This function internally uses \emph{HTMLTemplateElement.innerHTML} property when creating the
+The transformed Solid.js code uses a \text{template} function (imported from \emph{solid-js/web}).
+This function internally uses the \emph{HTMLTemplateElement.innerHTML} property when creating the
 template. This triggers a Trusted Types violation when the code is executed in the browser. The
-solution is to create a Trusted Types policy wrapping the content assigned to \emph{innerHTML}
-property. This is secure, because the JSX transformation only creates the templates from statically
+solution is to create a Trusted Types policy wrapping the content assigned to the \emph{innerHTML}
+property. This is secure because the JSX transformation only creates the templates from statically
 known HTML. All dynamic and interpolated markup is rendered using JavaScript without using any
 dangerous sinks.
 
@@ -159,22 +158,22 @@ const _tmpl$ = template(`<form action="/action_page.php"><input type="text" id="
 
 The JSX preprocessing is able to ensure only statically known JSX values are passed to the
 \emph{template} function. These statically known values are coming from the source code written by
-the developer, so this code is implicetelly trusted. Any dynamic properties and attributes are set
+the developer, so this code is implicitly trusted. Any dynamic properties and attributes are set
 when the component renders and is not part of the generated template calls.
 
 \section{Bundlers}
 
 Bundlers deal with many different tasks such as code minification and obfuscation, loading different
-file types, bundling all of the source files into big chunks, hot reloading in development and more.
+file types, bundling the source files into big chunks, hot reloading in development, and more.
 
-Many of the bundler responsibilities are Trusted Types compliant out of the box, however many of the
-development only features break when Trusted Types are enforced. Usually bundlers include a
-development server which injects some markup into DOM to provide better developer experience for the
-application authors. Common examples include hot reloading changed parts of the application or
+Many of the bundler responsibilities are Trusted Types compliant out of the box. However, many of
+the development only features break when Trusted Types are enforced. Usually, bundlers include a
+development server that injects some markup into DOM to provide a better developer experience for
+the application authors. Common examples include hot reloading changed parts of the application or
 displaying error details in an overlay widget.
 
 Fortunately, Trusted Types are already supported in Webpack (starting from version 5), which is the
-most used bundler at time of writing. However, there are some new promising ones which provide
+most used bundler at the time of writing. However, there are some new promising ones that provide
 better performance or use ES modules which leads to simpler architecture and more performant design.
 
 \medskip
@@ -182,21 +181,20 @@ better performance or use ES modules which leads to simpler architecture and mor
 \medskip
 
 Vite is one of the modern bundlers which serves the source files via native ES modules which have
-many built in features and extremely fast and reliable hot module replacement (HMR) for development.
+many built-in features and extremely fast and reliable hot module replacement (HMR) for development.
 It also provides a simple way to bundle production code using another common bundler called Rollup.
 
-Vite is especially interesting to us, because it is a preferred bundler for creating applications
-using solid.js framework. To support development of solid applications, we needed to create a
-Trusted Types integration for Vite.
+Vite is a preferred bundler for creating applications using the Solid.js framework. To support the
+development of these applications, we needed to create a Trusted Types integration for Vite.
 
-We followed the integration process from chapter (\ref{tt_integration_setup}) and have identified
-three places which cause Trusted Types violations. These can be categorized into:
+We followed the integration process from chapter (\ref{tt_integration_setup}) and have
+identified three places that cause Trusted Types violations. These can be categorized into:
 
 \begin{itemize}
   \item Creation of style elements -- Internally, Vite used \emph{innerHTML} of an HTML style
         element to apply styles to the DOM. These two occurrences can be replaced with a
         safer alternative using \emph{textContent} which does not trigger a Trusted Types
-        violation, but works for CSS stylesheet creation.
+        violation but works for CSS stylesheet creation.
 
         \bigskip
         \begin{lstlisting}[language=JavaScript, caption=Creation of style elements using \emph{innerHTML} in Vite \cite{commit_vite_inner_html_styles}]
@@ -211,11 +209,11 @@ if (!style) {
 \end{lstlisting}
 
   \item Showing error overlay -- Vite supports HMR during development and part of this feature is to
-        display error overlay when there is an error triggered by the development server. This
-        usually happens when there is an syntax error in the code. The overlay widget uses
+        display an error overlay when there is an error triggered by the development server. This
+        usually happens when there is a syntax error in the code. The overlay widget uses the
         \emph{innerHTML} property to inject the overlay HTML markup on top of the client's web
-        page. The solution in this case was to introduce a Trusted Types policy to wrap the overlay
-        code inside Trusted Types policy. Alternative solution would be to create the overlay
+        page. In this case, the solution was to introduce a Trusted Types policy to wrap the overlay
+        code inside the Trusted Types policy. An alternative solution would be to create the overlay
         markup dynamically using \emph{document.createElement}.
 
         In the future, Trusted Types API might provide support for constructing trusted values from

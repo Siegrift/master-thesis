@@ -1,31 +1,28 @@
 \chapter{Integrations into web frameworks}
 
-In this chapter we describe a partial Trusted Types support for Next.js. Then we show how to use
+In this chapter, we describe a partial Trusted Types support for Next.js. Then we show how to use
 Trusted Types with React. React already supports Trusted Types behind a feature flag and we only
-show how to enable this feature flag for application created via \emph{Create React App}. Lastly, we
-build upon the Solid.js integrations from previous chapter and verify the integrations in a open
-source real world application. This shows both, that our integrations are correct and also how to
-migrate non Trusted Types compliant applications.
+show how to enable this feature flag for applications created via \emph{Create React App}. Lastly,
+we build upon the Solid.js integrations from the previous chapter and verify the integrations in an
+open-source real-world application. This shows both, that our integrations are correct and also how
+to migrate an application to Trusted Types.
 
-Web frameworks and libraries is a software that is designed to support development of web
+Web frameworks and libraries is a software that is designed to support the development of web
 applications and services. They try to solve common problems faced in web development, such as
-building user interfaces, testing, building and bundling the application. Typical web application
-consists of numerous libraries and software frameworks which together create the resulting web
-application.
-
-In this chapter we describe the frameworks we examined and integrations we implemented. We document
-each unique property of the integration, sinks found and the respective solutions implemented.
+building user interfaces, testing, building, and bundling the application. The typical web
+application consists of numerous libraries and software frameworks that together create the
+resulting web application.
 
 \section{Next.js integration}
 \label{intro-nextjs}
 
-Next.js is one of the most popular frameworks for building web applications. The framework is build
+Next.js is one of the most popular frameworks for building web applications. The framework is built
 upon React which is the most used UI framework as of 2021 \cite{react_most_used_2021}. Parts of a
-Next.js application can be rendered statically, server side or fully client side on a page by page
-basis. Next.js is thus not only about the client side code, but it can also handle server side logic
-which opens up different means of attacks such as reflected XSS, SQL injections and more.
+Next.js application can be rendered statically, server-side, or fully client-side on a page-by-page
+basis. Next.js is thus not only about the client-side code, but it can also handle server-side logic
+which opens up different means of attacks such as reflected XSS, SQL injections, and more.
 
-Next.js was our initial choice for Trusted Types integration, because of the large impact this
+Next.js was our initial choice for Trusted Types integration because of the large impact this
 integration would have. The framework itself seemed interested in the integration of Trusted Types
 for a longer time \cite{nextjs_tt_pr_2020}.
 
@@ -64,15 +61,15 @@ export const __unsafeAllowScript = (script) => getOrCreatePolicy()?.createScript
 
 The fixes needed were small and the Trusted Types API specific code was encapsulated in a single
 small module. That said, the implementation was only a proof of concept. However, we found out that
-there are other engeneers working on this integration and we decided not pursue this project
+there are other engineers working on this integration and we decided not pursue this project
 further. Instead we shifted our focus to a different projects and integrations.
 
 \subsection{Tsec violations}
 
 Tsec found 8 violations \cite{tsec_output} inside Next.js sources. Out of these 7 were indeed
 Trusted Types violations that needed to be fixed. Some of these could be fixed simply on a type
-system level since they expected a value from the user. The others needed to be explicitely allowed
-through a policy. The implementation for this proof of concept can be found on github
+system level since they expected a value from the user. The others needed to be explicitly allowed
+through a policy. The implementation for this proof of concept can be found on GitHub
 \cite{nextjs_fix_tsec_violations_commit}.
 
 Since our utmost goal was to find the sinks and create a prototype for the integration we wrapped
@@ -81,21 +78,21 @@ all of these values in Trusted Types objects. This was to be revisited in the fu
 \subsection{Development mode violations}
 
 Fixing the violations found by Tsec was not enough and the application still would not work under
-Trusted Types enforcement. This was caused by a webpack plugin used in one of the Next.js
+Trusted Types enforcement. This was caused by a Webpack plugin used in one of the Next.js
 dependencies which used eval internally. The workaround for this was to use a default policy and
-allow all eval calls. The proper solution would be to fix the eval issue in the webpack plugin via a
+allow all eval calls. The proper solution would be to fix the eval issue in the Webpack plugin via a
 policy.
 
-Apart from this, there was another violation that was triggered caused by application during hot
-reload (\ref{def:hot_reload}). Tsec did not to catch this problem, since the violation came from a
-JavaScript file where the AST information was limited.
+Apart from this, another violation that was triggered was caused by the application hot reloading
+during development. Tsec did not catch this problem since the violation came from a JavaScript file
+where the AST information was limited.
 
 \section{Create React App integration}
 
 Create React App (CRA) is a CLI and an officially recommended way to create single-page React
 applications. It offers an easy React application setup with no configuration. The source code of
 this tool does not depend on React directly. It is only used to generate the project files based on
-a hard coded template and then it installs the latest version of React and other necessary
+a hard-coded template and then it installs the latest version of React and other necessary
 dependencies.
 
 CRA was a second project we wanted to integrate Trusted Types to. Our goal was to make sure the
@@ -105,52 +102,52 @@ generated application is Trusted Types compatible.
 \begin{flushleft}\textbf {Using Trusted Types compatible version of React}\end{flushleft}
 \medskip
 
-To accomplish this, we would need to change the implementation of CRA to install Trusted Types
+To accomplish this, we would need to change the implementation of CRA to install the Trusted Types
 compatible version of React. Unfortunately, such version of React is implemented only under a
-feature flag which needs to be turned on at build time. The published version of React has feature
-flag turned off. This means that in order to use the Trusted Types compatible version of React, the
+feature flag that needs to be turned on at build time. The published version of React has a feature
+flag turned off. This means that to use the Trusted Types compatible version of React, the
 developers need to edit the React source code and turn on the feature flag. Then build the framework
-themselves. This custom built version can then be used as a dependency in the project generated by
+themselves. This custom-built version can then be used as a dependency in the project generated by
 CRA.
 
-Implementing this is non trivial, since it requires knowledge about React. More importantly though,
-this is harder to maintain for the application authors since they need to keep up with the new
-releases of React manually.
+Implementing this is non-trivial since it requires knowledge about React. More importantly, this is
+harder to maintain for the application authors since they need to keep up with the new releases of
+React manually.
 
 \medskip
 \begin{flushleft}\textbf {Using Trusted Types compliant version of Webpack}\end{flushleft}
 \medskip
 
-CRA internally uses webpack 5 to provide convenient development features and transfrom and bundle
-application for production. Some of these features cause Trusted Types violation. Gladly, webpack
-can be configured to be Trusted Types compliant by a small configuration change
+CRA internally uses Webpack 5 to provide convenient development features, transform and bundle
+production applications. Some of these features cause Trusted Types violations. Gladly, Webpack can
+be configured to be Trusted Types compliant by a small configuration change
 \cite{webpack_tt_config}.
 
-The problem with CRA is that the webpack configuration is hidden from the user. Unfortunately, there
+The problem with CRA is that the Webpack configuration is hidden from the user. Unfortunately, there
 is no way how to override this configuration manually. The workaround is to spy on imported
 JavaScript modules and change their content. This pattern is often used when mocking or spying in
 unit tests. However, it is also a suitable solution for this case \cite{cra_modify_webpack_config}.
 
-Another issue we faced was caused by \emph{webpack-dev-server} which is only used in development and
-provides features like hot module replacement or showing error overlays. We found out that the error
-overlay widget is created via \emph{innerHTML} which causes a Trusted Types violation and prevents
-the error from being shown. The solution is to create a policy for the overlay widget and use a
-custom version of this dependency. Since Trusted Types are supported in Webpack we directly opened a
-Github issue \cite{tt_webpack_dev_server:issue} and proposed our solution
+Another issue we faced was caused by \emph{webpack-dev-server} which is only used in the development
+and provides features like hot module replacement or showing error overlays. We found out that the
+error overlay widget is created via \emph{innerHTML} which causes a Trusted Types violation and
+prevents the error from being shown. The solution is to create a policy for the overlay widget and
+use a custom version of this dependency. Since Trusted Types are supported in Webpack we directly
+opened a GitHub issue \cite{tt_webpack_dev_server:issue} and proposed our solution
 \cite{tt_webpack_dev_server:pr}.
 
 \bigskip
-\begin{lstlisting}[language=JavaScript, caption=Script to start React application with Trusted Types enabled in webpack]
+\begin{lstlisting}[language=JavaScript, caption=Script to start React application with Trusted Types enabled in Webpack]
 // File 'scripts/start.js'
 const rewire = require('rewire')
 const defaults = rewire('react-scripts/scripts/start.js')
 const webpackConfig = require('react-scripts/config/webpack.config')
 
-// In order to override the webpack configuration without ejecting the create-react-app
+// In order to override the Webpack configuration without ejecting the create-react-app
 defaults.__set__('configFactory', (webpackEnv) => {
   let config = webpackConfig(webpackEnv)
 
-  // Customize the webpack configuration here, for reference I have updated webpack externals field
+  // Customize the Webpack configuration here, for reference I have updated Webpack externals field
   config.output.trustedTypes = {
     policyName: 'webpack-policy',
   }
@@ -159,32 +156,33 @@ defaults.__set__('configFactory', (webpackEnv) => {
 })
 \end{lstlisting}
 
-The application is then started simply by running this script using Node.js environment.
+The application is then started simply by running this script using the Node.js environment.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Starting the CRA application]
 node ./scripts/start
 \end{lstlisting}
 
-Another option is to use the \emph{eject} command from CRA. This is a one way operation and it
-unwraps all of the hidden configuration and creates these files in the project. Developers can then
-edit the exposed webpack configuration which is now part of the project. This is not recommended and
-should be used only when other attempts fail. The generated webpack configuration is pretty complex
+Another option is to use the \emph{eject} command from CRA. This is a one-way operation and it
+unwraps all of the hidden configurations and creates these files in the project. Developers can then
+edit the exposed Webpack configuration which is now part of the project. This is not recommended and
+should be used only when other attempts fail. The generated Webpack configuration is pretty complex
 and updating it in the future might not be trivial.
 
 \section{Solid.js integration}
 \label{section:solid}
 
-Solid.js is a simple, modern and reactive framework for building user interfaces. Framework
+Solid.js is a simple, modern, and reactive framework for building user interfaces. Framework
 syntax is largely inspired by React, but the internals are different. JSX internally makes use of
-HTML template elements. Both frameworks are component oriented. The main difference is that React
+HTML template elements. Both frameworks are component-oriented. The main difference is that React
 uses a concept called \emph{virtual DOM} in which the UI representation is kept in memory and synced
 with the "real" DOM. Solid.js does not use virtual DOM and performs all UI updates directly.
 
 We have already described the Solid.js JSX transformation in the preprocessor chapter
 (\ref{jsx_solid_preprocessor}) where we implemented a Trusted Types integration. We wanted to test
-the changes on a real world project. Fortunately, there is fully fledged fullstack application which
-we used \cite{original_solid_realworld_project}. We made a few additional changes, specifically:
+the changes on a real-world project. Fortunately, there is a fully fledged full stack application
+which we used \cite{original_solid_realworld_project}. We made a few additional changes,
+specifically:
 
 \begin{enumerate}
   \item Used custom version of Vite and Solid.js
@@ -197,22 +195,21 @@ with all the integrated projects \cite{solid_realworld_project:readme}.
 
 \subsection{Using custom dependencies}
 
-The real world project uses Rollup as a bundler, but we decided to replace Rollup with Vite,
-because Vite is the preferred bundler for developing Solid.js application and we also wanted to test
-that our integration works properly.
+The real-world project uses the Rollup bundler, but we decided to replace Rollup with Vite because
+Vite is the preferred bundler for developing Solid.js applications and we also wanted to test that
+our integration works properly.
 
 The only changes we needed to implement were to use our custom version of Vite and rename the file
-extension for all source files from \emph{.js} to \emph{.jsx} in order for Vite to correctly
-preprocess the JSX. We also used the custom version of Solid.js to generate Trusted Types compliant
-code after JSX transformation. See the necessary code changes in
-\cite{solid_realworld_project:vite}.
+extension for all source files from \emph{.js} to \emph{.jsx} for Vite to correctly preprocess the
+JSX. We also used the custom version of Solid.js to generate Trusted Types compliant code after JSX
+transformation. See the necessary code changes in \cite{solid_realworld_project:vite}.
 
 \subsection{Adding Trusted Types policies}
 
 After all of the dependencies were ready, we needed to enable the Trusted Types enforcement. We used
-a HTML meta tag and enabled all of the policies needed. Because hot reloading in Vite reloads the
-full module, we had to use \emph{'allow-duplicates'} to allow recreating the policy when it's
-module is reloaded. Having this is not needed for production.
+a HTML meta tag and enabled policies needed. Because hot reloading in Vite reloads the full module,
+we had to use \emph{'allow-duplicates'} to allow recreating the policy when it's module is reloaded.
+Having this is not needed for production.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creation of style elements using \emph{innerHTML} in Vite \cite{commit_vite_inner_html_styles}]
@@ -223,7 +220,7 @@ module is reloaded. Having this is not needed for production.
 \end{lstlisting}
 
 We also needed to create a Trusted Types policy for the application itself. One of the source files
-uses a third party API to load a HTML content and assign that into \emph{innerHTML} property. This
+uses a third-party API to load a HTML content and assign that into \emph{innerHTML} property. This
 could easily lead to an XSS if the API was malicious or got hacked. This means that Trusted Types
 helped find and prevent a possible attack vector. Since the application used this only for
 demonstration purposes we decided to allow this pattern via a policy.
@@ -233,6 +230,6 @@ See the necessary changes in \cite{solid_realworld_project:tt_policy}.
 \subsection{Implementing end to end tests}
 
 After making sure the application works as intended both in development and production, we decided
-to create e2e tests to verify this. We chose Cypress as the testing framework and created our own
-testing plugin which is described in its own chapter (\ref{cypress_testing_plugin}). See the
+to create e2e tests to verify this. We chose Cypress as the testing framework and created our
+testing plugin which is described in its chapter (\ref{cypress_testing_plugin}). See the
 implementation of these tests in \cite{solid_realworld_project:tests}.

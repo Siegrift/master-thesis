@@ -4,7 +4,7 @@
 \label{definitions}
 
 \emph{These are the common terms used in this paper that are too broad to be explained in specific
-  chapters, but should be understood by the reader before reading the paper. Advanced readers may
+  chapters but should be understood by the reader before reading the paper. Advanced readers may
   skip this section and start with the first chapter (\ref{chapter_intro}).}
 
 % Need to use "enumerate" otherwise linking stops working. See:
@@ -15,13 +15,13 @@
         page.
   \item \label{def:dom_source_sink} \textbf{DOM source and sink} -- In the context of XSS, a DOM
         source is the location from which untrusted data is taken by the application and passed on
-        to the sink, for example \emph{location} or \emph{cookies}. DOM sinks are the places where
-        untrusted data coming from the sources is actually getting executed resulting in DOM XSS,
-        for example \emph{eval} or \emph{Element.innerHTML} \cite{source_sink_definition}. We might
-        also refer to a sink as an \emph{injection sink}, because the untrusted value is injected
+        to the sink, for example, \emph{location} or \emph{cookies}. DOM sinks are the places where
+        untrusted data coming from the sources is getting executed resulting in DOM XSS, for
+        example, \emph{eval} or \emph{Element.innerHTML} \cite{source_sink_definition}. We might
+        also refer to a sink as an \emph{injection sink} because the untrusted value is injected
         into the sink by the attacker.
-  \item \label{def:spa} \textbf{SPA} -- SPA stands for \emph{Single Page Applications} and it
-        is a website which interacts with the user by dynamically rewriting the contents of the site
+  \item \label{def:spa} \textbf{SPA} -- SPA stands for \emph{Single-Page Applications} and it
+        is a website that interacts with the user by dynamically rewriting the contents of the site
         instead of loading new pages from the server.
   \item \label{def:ts} \textbf{TypeScript} -- TypeScript is a strict syntactical superset of
         JavaScript and adds optional static typing to the language. It is designed for the

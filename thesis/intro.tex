@@ -1,18 +1,19 @@
 \chapter{Introduction}
 \label{chapter_intro}
 
-In this chapter we give a brief overview of cross site scripting (XSS), which is one of the most
-common web application vulnerabilities. We mainly focus on DOM based XSS for which Trusted Types are
+In this chapter we give a brief overview of cross-site scripting (XSS), which is one of the most
+common web application vulnerabilities. We mainly focus on DOM-based XSS for which Trusted Types are
 the most effective. We then explain the design of Trusted Types and how it helps to detect and
 mitigate these vulnerabilities. Lastly, we describe the motivation and background for our work.
 
-\section{Cross site scripting}
+\section{Cross-site scripting}
 
-Cross site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
+Cross-site scripting (XSS) is one of the most prevalent vulnerabilities on the web. It is an attack
 of web applications taking untrusted user input and interpreting it as code without sanitization or
-escaping. There are multiple categories of XSS. Most experts distinguish at least between non
-persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third category,
-DOM based XSS, which will be explained in more depth as this is a variant that Trusted Types target.
+escaping. There are multiple categories of XSS. Most experts distinguish at least between
+non-persistent \emph{(reflected)} and persistent \emph{(stored)} XSS. There is also a third
+category, DOM-based XSS, which will be explained in more depth as this is a variant that Trusted
+Types target.
 
 \begin{itemize}
   \item  Stored -- A malicious injected script is permanently saved in a server database. The client
@@ -21,16 +22,16 @@ DOM based XSS, which will be explained in more depth as this is a variant that T
   \item  Reflected -- Typically delivered via email or a neutral website. It occurs when a
         malicious script is reflected off of a web application to the victim's browser
         \cite{reflected_xss}.
-  \item  DOM based -- The vulnerability appears in the DOM (\ref{def:dom}) by executing a malicious
+  \item  DOM-based -- The vulnerability appears in the DOM (\ref{def:dom}) by executing a malicious
         code. In reflected and stored XSS attacks one can see the vulnerability payload in the
-        server response. However in a DOM based XSS, the attack payload is executed as a result of
-        modifying the DOM environment in the victim's browser so that the client side code runs in
+        server response. However, in a DOM-based XSS, the attack payload is executed as a result of
+        modifying the DOM environment in the victim's browser so that the client-side code runs in
         an unexpected manner.
 \end{itemize}
 
-Cross site scripting vulnerability became more widespread with the boom of single page applications
-(SPA) (\ref{def:spa}), where most of the behaviour is achieved by modifying the DOM using
-JavaScript. There are many functions, element attributes and properties in the DOM API which
+Cross-site scripting vulnerability became more widespread with the boom of single-page applications
+(SPA) (\ref{def:spa}), where most of the behavior is achieved by modifying the DOM using
+JavaScript. There are many functions, element attributes, and properties in the DOM API which
 interpret the arguments as an executable code. We call these DOM sinks (\ref{def:dom_source_sink}).
 These sinks make it easy for developers to accidentally introduce this vulnerability
 \cite{tt_web_framework_paper}.
@@ -54,8 +55,8 @@ Worker()
 \end{figure}
 
 One of the most basic examples of XSS is the interpolation of URL parameters in the DOM. The
-attacker can prepare a malicious URL which he sends to a victim. The victim executes the payload
-just by navigating to the site sent by the attacker.
+attacker can prepare a malicious URL which they then send to a victim. The victim executes the
+payload just by navigating to the site sent by the attacker.
 
 \bigskip
 \begin{lstlisting}[language=HTML, caption=Basic example of XSS via unsafe URL parameter interpolation]
@@ -77,32 +78,32 @@ https://example.com?<img%20src=x%20onerror="alert(1)"></img>
 \end{lstlisting}
 
 The consequences of XSS vary a lot. Their severity can range from benign annoyances to unrecoverable
-damages such as full account compromise, disclosure of user's cookies, storage, secrets or session.
-Other attacks may use XSS to change the application content and present fraudulent information to
-the user.
+damages such as full account compromise, and disclosure of users' cookies, storage, secrets, or
+session. Other attacks may use XSS to change the application content and present fraudulent
+information to the user.
 
 There are many attempts to reduce the risk of DOM XSS either by dynamic or static checkers. The
-former usually suffer from performance and scalability issues when applied on large codebases while
-the latter provide suboptimal results due to JavaScript dynamic nature
+former usually suffers from performance and scalability issues when applied on large codebases while
+the latter provides suboptimal results due to JavaScript's dynamic nature
 \cite{tt_web_framework_paper} \cite{owasp_xss_cheatsheet}.
 
 \section{Trusted Types}
 
 Trusted Types is a relatively modern web API designed by Google based on a long history of
-mitigating XSS \cite{tt_design_history}. It is currently supported in Chrome, Edge and Opera.
+mitigating XSS \cite{tt_design_history}. It is currently supported in Chrome, Edge, and Opera.
 
 It is a browser security feature that limits access to dangerous DOM APIs to protect against DOM
 XSS. Trusted Types provide type guarantees to all frontend code by enforcing security type checks
-for potentially user controlled and malicious values. They are delivered through a CSP header and
-have a report only mode that does not change the application behavior and an enforcement mode that
+for potentially user-controlled and malicious values. They are delivered through a CSP header and
+have a report-only mode that does not change the application behavior and an enforcement mode that
 may cause user observable breakages \cite{tt_background}.
 
 When enforced, Trusted Types block dangerous injection sinks from being called with values that have
 not passed through a Trusted Types policy \cite{tt_background}. If an untrusted value is passed to
-sink a Trusted Types violation is raised and the DOM is unaffected. In practice this means that a
+sink a Trusted Types violation is raised and the DOM is unaffected. In practice, this means that a
 potential DOM XSS has been prevented.
 
-There are many other resources which can be used to explore Trusted Types in details
+There are many other resources that can be used to explore Trusted Types in detail
 \cite{tt_resources}.
 
 \subsection{Threat model}
@@ -110,7 +111,7 @@ There are many other resources which can be used to explore Trusted Types in det
 Trusted Types is a powerful API. Its main goals are to \cite{tt_spec:goals}:
 
 \begin{itemize}
-  \item reduce the risk of client side vulnerabilities caused by injection sinks.
+  \item reduce the risk of client-side vulnerabilities caused by injection sinks.
   \item replace the insecure by default APIs with safer alternatives which are harder to misuse.
   \item encourage a design where the code affecting the application security is encapsulated in a
         small parts of an application.
@@ -118,20 +119,20 @@ Trusted Types is a powerful API. Its main goals are to \cite{tt_spec:goals}:
 \end{itemize}
 
 The main idea behind Trusted Types is to make the dangerous DOM APIs secure by default and encourage
-application authors to use safer APIs. This model is very effective for preventing DOM based XSS,
-however there are still areas where Trusted Types are not effective enough and other security
-measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:non_goals}:
+application authors to use safer APIs. This model is very effective for preventing DOM-based XSS.
+However, there are still areas where Trusted Types are not effective enough and other security
+measures are needed. Some of the non-goals of Trusted Types are \cite{tt_spec:non_goals}:
 
 \begin{itemize}
   \item preventing or mitigating server side generated markup attacks -- Defending against XSS on
         both client and server can be really complex, especially for applications where parts of the
-        code can run on both client and server, for example as in Next.js (\ref{intro-nextjs}). To
+        code can run on both client and server, for example, as in Next.js (\ref{intro-nextjs}). To
         address these attacks, use the existing recommended solutions like templating systems or CSP
         \emph{script-src} directive.
   \item controling subresource loading -- Trusted Types deal with code running in realm of the
         current document and does not guard subresources.
-  \item guarding cross origin JavaScript execution, for example loading new documents via
-        \emph{data:} URLs -- Trusted Types do not guard cross origin executions at all
+  \item guarding cross-origin JavaScript execution, for example, loading new documents via
+        \emph{data:} URLs -- Trusted Types do not guard cross-origin executions at all
   \item protecting against malicious developers of the web application -- It is implicitly assumed
         that untrusted developer can cause more severe damages. Attempting to guard against
         malicious developer would lead to complex and impractical design.
@@ -142,10 +143,10 @@ measures are needed. Some of the non goals of Trusted Types are \cite{tt_spec:no
 
 Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate
 certain types of attacks, including XSS and data injection attacks \cite{mdn_csp_def}. CSP provides
-a way for browsers to create safer APIs in a backwards compatible manner, since the API has to be
-opt in explicitely by the application server by sending the CSP response header or using the CSP
+a way for browsers to create safer APIs in a backward compatible manner since the API has to be
+opted in explicitly by the application server by sending the CSP response header or using the CSP
 inside the HTML meta tag in the response body. If the browser does not support the CSP directive,
-the directive is ignored and standard browser behaviour applies.
+the directive is ignored and standard browser behavior applies.
 
 Trusted Types are enabled through a CSP using two different directives:
 
@@ -170,19 +171,19 @@ Content-Security-Policy: trusted-types <policyName> <policyName> 'allow-duplicat
 
 \end{itemize}
 
-These directives together enable and configure Trusted Types behaviour for the particular web
+These directives together enable and configure Trusted Types behavior for the particular web
 application. They allow the application authors to define rules guarding write access to the DOM
 sinks and thus reducing the DOM XSS attack surface to small parts of the web application. These
-smaller parts can be modularized where they can be more easily monitored, reviewed and maintained.
+smaller parts can be modularized where they can be more easily monitored, reviewed, and maintained.
 
-Apart from the standard \emph{Content-Security-Policy} header there is also
-\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in a report
-only mode. Trusted Types violations are only interpreted as warnings in this mode. This way the
-application can gradually work on Trusted Types compliance without breaking the existing users. It
-is also recommended to use the report only mode in production for some time to make sure the
+Apart from the standard \emph{Content-Security-Policy} header, there is also
+\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in a
+report-only mode. Trusted Types violations are only interpreted as warnings in this mode. This way
+the application can gradually work on Trusted Types compliance without breaking the existing users.
+It is also recommended to use the report-only mode in production for some time to make sure the
 integration is working as expected \cite{tt_web_framework_paper}.
 
-Once Trusted Types are enabled, the browser changes the behaviour of insecure DOM API sinks and
+Once Trusted Types are enabled, the browser changes the behavior of insecure DOM API sinks and
 expects "trusted" values instead of regular strings. These trusted values are created via Trusted
 Types policies.
 
@@ -190,11 +191,11 @@ Types policies.
 \label{subsec:tt_policy}
 
 The core part of Trusted Types API are policies which are factory functions for creating "trusted"
-values which can be safely passed to DOM sinks when Trusted Types are enabled. The policies are
-created by the application and access to them should be restricted. In javascript this can be easily
-achieved by encapsulating a policy in its own module and exporting only a very specific functions
-which use this policy internally. The values created from the policies are unforgeable and
-immutable, meaning there is no way for attacker to pass a value to dangerous DOM APIs.
+values that can be safely passed to DOM sinks when Trusted Types are enabled. The policies are
+created by the application and access to them should be restricted. In javascript, this can be
+easily achieved by encapsulating a policy in its own module and exporting only very specific
+functions which use this policy internally. The values created from the policies are unforgeable and
+immutable, meaning there is no way for an attacker to pass a value to dangerous DOM APIs.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Creating a Trusted Types policy, label={lst:create_tt_policy}]
@@ -216,12 +217,12 @@ const trustedHtml = myPolicy.createHTML("<span>safe html</span>");
 
 The code listing \ref{lst:create_tt_policy} creates a Trusted Types policy using the callback
 functions. This callback function is called when the policy is used to create a trusted value. It
-receives the sink value of a string type as an argument and returns a string value that should be
-XSS free and thus can be trusted. In practice, this function may be implemented as \emph{identity
-  function} if the payload is known to be trusted. Another examples of policy callback implementation
-would be to sanitize the sink value or perform certain whitelist logic. In case the payload should
-not be used or can not be sanitized, the function should return \emph{null} or \emph{undefined}
-which will trigger a Trusted Types violation.
+receives a sink value of a string type as an argument and returns a string value that should be XSS
+free and thus can be trusted. In practice, this function may be implemented as an \emph{identity
+  function} if the payload is known to be trusted. Another example of policy callback implementation
+would be to sanitize a sink value or perform certain whitelist logic. In case the payload should not
+be used or can not be sanitized, the function should return \emph{null} or \emph{undefined} which
+will trigger a Trusted Types violation.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Using a policy to sanitize HTML values]
@@ -231,22 +232,22 @@ const myPolicy = window.trustedTypes.createPolicy('sanitize-html', {
 \end{lstlisting}
 
 It is important to ensure that policies are either secure for all possible inputs, or limit the
-access to insecure policies, such that they are only called with non attacker controlled inputs
-\cite{tt_spec:best_practice_policy}.
+access to insecure policies, such that they are only called with inputs that are not attacker
+controlled \cite{tt_spec:best_practice_policy}.
 
 \subsection{Default policy}
 
 There is one special case for Trusted Types policies. Applications may create a policy called
-"default". This policy has a special behaviour. When a string value is passed to a DOM sink when
-Trusted Types are enabled, the user agent will implicitely flow the untrusted string value through
+"default". This policy has special behavior. When a string value is passed to a DOM sink when
+Trusted Types are enabled, the user agent will implicitly flow the untrusted string value through
 the default policy. The callback function of the default policy receives three arguments instead of
-one -- the string payload, sink type and a sink name respectively. This allows the application to
-recover from an unexpected sink usage, for example by sanitizing the untrusted value. If the default
-policy does not exist, returns \emph{null} or \emph{undefined} a CSP violation will be triggered
-\cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode even
-though the application is not fully Trusted Types complaint.
+one -- the string payload, sink type, and a sink name respectively. This allows the application to
+recover from an unexpected sink usage, for example, by sanitizing the untrusted value. If the
+default policy does not exist, it returns \emph{null} or \emph{undefined} a CSP violation will be
+triggered \cite{tt_spec:default_policy}. Applications can use this policy to enable enforcement mode
+even though the application is not fully Trusted Types complaint.
 
-This feature is intended to be used by applications with legacy or third party code that uses
+This feature is intended to be used by applications with legacy or third-party code that uses
 injection sinks. The policy callback functions should be defined with very strict rules to prevent
 bypassing security restrictions enforced by Trusted Types API. For example, having an "accept all"
 default policy allows malicious attacker payloads to reach the DOM sinks. Developers should be very
@@ -268,14 +269,15 @@ trustedTypes.createPolicy('default', {
 
 \subsection{Reviewability}
 
-Consider the process of security reviews for web applications, specifically reasoning about DOM
-based XSS. There are many tools and methodologies which can help reason about the application
-security, but there is no automated way that can assert the safety of an web application. This means that
-it is still necessary for security engeneers to manually review the implementation and look for
+Consider the process of security reviews for web applications, specifically reasoning about
+DOM-based XSS. There are many tools and methodologies which can help reason about the application
+security, but there is no automated way that can assert the safety of a web application. This means
+that it is still necessary for security engineers to manually review the implementation and look for
 potential vulnerabilities and analyze them.
 
-When focusing on client side XSS, the engineer has to determine whether application uses dangerous
-DOM sinks, either implicitely or explicitely, and whether there is a way for attacker to misuse them.
+When focusing on client-side XSS, the engineer has to determine whether an application uses
+dangerous DOM sinks, either implicitly or explicitly, and whether there is a way for an attacker to
+misuse them.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Possibly dangerous function]
@@ -305,28 +307,29 @@ function depends on both its direct and indirect callers, both present and futur
 
 Looking for the callers of the function can be difficult because of the dynamic nature of
 JavaScript. Also, JavaScript is a mutable language which makes it harder to reason about function
-calls, especially the third party ones.
+calls, especially the third-party ones.
 
 When the application enforces Trusted Types, the engineer does not have to care about the dangerous
 functions and its callers. The focus of the security review shifts to reasoning about the creation
 of trusted values and policies. Once a trusted value is created, it is immutable and the policy
 which created it provides the security guarantees. When a trusted value reaches a sink, this
-guarantee still holds independently of how the value flew the callers. Consider the third party call
+guarantee still holds independently of how the value flew the callers. Consider the third-party call
 in the listing \ref{lst:dangerous_fn_usage} and assume \emph{data.html} contains a TrustedHTML
-value. If a third party call modifies this value a violation is thrown when it is passed to a DOM
+value. If a third-party call modifies this value a violation is thrown when it is passed to a DOM
 sink.
 
 \subsection{Browser support and polyfill}
 
-Trusted Types are currently supported in Chromium family of browsers \cite{mdn:tt_compatibility}.
-Developers creating Trusted Types compliant application should always check if Trusted Types API is
-available in the current execution context, which does not necessary need to be a browser. It is
-very common for Node.js applications to pre render the client side code on the server to provide
-faster experience for the end users. This brings additional complexity and new attack vectors in
-forms of reflected XSS, various kinds of injection and more, which are out of Trusted Types scope.
+Trusted Types are currently supported in the Chromium family of browsers
+\cite{mdn:tt_compatibility}. Developers creating Trusted Types compliant applications should always
+check if Trusted Types API is available in the current execution context, which does not necessarily
+need to be a browser. It is very common for Node.js applications to pre-render the client-side code
+on the server to provide faster experience for the end users. This brings additional complexity and
+new attack vectors in the forms of reflected XSS, various kinds of injection, and more, which are
+out of Trusted Types scope.
 
-Additional benefit of Trusted Types compliant applications is that all sinks are protected. The
-application can use a polyfill for browsers which do not support Trusted Types, maintaining the same
+An additional benefit of Trusted Types compliant applications is that all sinks are protected. The
+application can use a polyfill for browsers that do not support Trusted Types, maintaining the same
 security properties as in the browsers where they are supported \cite{xss_nowhere_with_polyfill}.
 
 There are multiple variants of the polyfill:
@@ -342,22 +345,22 @@ There are multiple variants of the polyfill:
 
 \section{Motivation and background}
 
-Trusted Types provide opportunity to significantly reduce the risk of a client side XSS and has been
-proven in various projects of various scale \cite{tt_web_framework_paper}
+Trusted Types provide the opportunity to significantly reduce the risk of a client-side XSS and has
+been proven in various projects of various scale \cite{tt_web_framework_paper}
 \cite{tt_integration_list}. However, projects need to refactor parts of their code, which can be
-difficult, especially in the open source world where the software is composed by multiple
+difficult, especially in the open-source ecosystem where the software is composed of multiple
 dependencies which can not easily be modified. This presents a large barrier in Trusted Types
 adoption \cite{tt_web_framework_paper} with a "chicken and egg" problem. There is not enough
-pressure for framework authors to migrate to Trusted Types because there is not is not enough usage.
+pressure for framework authors to migrate to Trusted Types because there is not enough usage.
 However, there is not enough usage because a lot of applications are prevented to migrate because
 their dependencies do not work with Trusted Types.
 
-Security engineers and software developers have often different priorities, the former focus on
+Security engineers and software developers have often different priorities, the former focusing on
 security, the latter on the application features. Trusted Types bridge this gap by providing secure
-by default software. The ideal scenario would be if the open source libraries used Trusted Types
+by default software. The ideal scenario would be if the open-source libraries used Trusted Types
 transparently to the application authors.
 
-In this paper we try to analyze some of the most popular open source frameworks and libraries and
-show that there are workarounds for projects to use Trusted Types without too much difficulties. We
+In this paper, we try to analyze some of the most popular open-source frameworks and libraries and
+show that there are workarounds for projects to use Trusted Types without too many difficulties. We
 want to implement some integrations and an example application to encourage application and
-framework authors to addopt Trusted Types to eradicate DOM based XSS.
+framework authors to adopt Trusted Types to eradicate DOM-based XSS.

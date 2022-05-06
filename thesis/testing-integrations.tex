@@ -1,32 +1,32 @@
 \chapter{Integrations into testing frameworks}
 
-In this chapter we describe a Cypress plugin that we created to simplify testing of Trusted Types in
-web applications. This plugin is created from scratch, verified with many tests and also used to
-test the real world application written in Solid.js from the previous chapter.
+In this chapter, we describe a Cypress plugin that we created to simplify the testing of Trusted
+Types in web applications. This plugin is created from scratch, verified with many tests, and also
+used to test the real-world application written in Solid.js from the previous chapter.
 
 Trusted Types are agnostic to the testing framework used and the type of tests. It is very common
-for web application to have a combination of unit and end to end tests. The former are used to
-smaller parts of application and typically run in Node.js environment. The latter usually test the
-whole application in browser environment and test the application features from the user
-perspective.
+for a web application to have a combination of unit and end-to-end tests. The former are used to
+test smaller parts of applications and typically run in the Node.js environment, where neither DOM
+nor Trusted Types are available. The latter usually test the whole application in a browser
+environment and test the application features from the user perspective.
 
 \section{Cypress Trusted Types plugin}
 \label{cypress_testing_plugin}
 
-Cypress is one of the most popular frameworks for end to end testing of web applications
+Cypress is one of the most popular frameworks for end-to-end testing of web applications
 \cite{js_state:testing}. It enjoys a rich ecosystem of plugins and supporting software. It runs the
 tests in real browsers and is fast and reliable due to its unique architecture. Developers can test
-Trusted Types compliant applications in Cypress out of the box, because most of the Cypress commands
+Trusted Types compliant applications in Cypress out of the box because most of the Cypress commands
 only query the DOM which does not produce Trusted Types violations.
 
-Even though Cypress supports Trusted Types out of the box, there are a few
-nuances the developer has to overcome to be able to test the application and Trusted Types
-violations. For this reason, we created a Cypress plugin which abstracts the low level details
-and provides a nicer API for the developers to use.
+Even though Cypress supports Trusted Types out of the box, there are a few nuances the developer has
+to overcome to be able to test the application and Trusted Types violations. For this reason, we
+created a Cypress plugin that abstracts the low-level details and provides a nicer API for the
+developers to use.
 
 \subsection{Applying the CSP header}
 
-Cypress removes the CSP header sent by the application server in order to load the application in an
+Cypress removes the CSP header sent by the application server to load the application in an
 \emph{iframe}, which could otherwise be prevented by a \emph{scriptSrc} CSP directive. There is a
 workaround for now, which is to intercept the request of the initial HTML application payload and
 copy the CSP policy from the response headers to the response body inside an HTML meta tag.
@@ -64,9 +64,9 @@ Cypress.Commands.add('enableCspThroughMetaTag', (options) => {
 
 While it is easy to test whether Trusted Types are supported (\ref{lst:cypress_test_tt_support}) it
 is harder to test whether some part of the code triggered Trusted Types violation. The reason is
-that the violation does not produce any user visible behaviour because the DOM is unchanged and
+that the violation does not produce any user-visible behavior because the DOM is unchanged and an
 uncaught exception is thrown and Cypress automatically fails the test. The developer needs to listen
-to \emph{uncaught:exception} handler from Cypress and explicitely recognize a Trusted Types
+to \emph{uncaught:exception} handler from Cypress and explicitly recognize a Trusted Types
 violation based on the error thrown and tell Cypress that this error is intended so it does not fail
 the test.
 
@@ -77,9 +77,9 @@ it('supports TT', () => {
 });
 \end{lstlisting}
 
-To simplify this low level handling for the developers we created a custom command which
-recognizes Trusted Types violations and remembers them for the lifetime of the current test so they
-can be asserted later on.
+To simplify this low-level handling for the developers we created a custom command which recognizes
+Trusted Types violations and remembers them for the lifetime of the current test so they can be
+asserted later on.
 
 \bigskip
 \begin{lstlisting}[language=JavaScript, caption=Custom command to catch Trusted Types violations]
