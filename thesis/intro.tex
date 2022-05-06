@@ -181,7 +181,7 @@ sinks and thus reducing the DOM XSS attack surface to small parts of the web app
 smaller parts can be modularized where they can be more easily monitored, reviewed, and maintained.
 
 Apart from the standard \emph{Content-Security-Policy} header, there is also
-\emph{Content-Security-Policy-Report-Only} which can be used to enable Trusted Types in a
+\emph{Content-Security-Policy-Report-Only} header which can be used to enable Trusted Types in a
 report-only mode. In this mode, Trusted Types violations are only interpreted as warnings. This way
 the application can gradually work on Trusted Types compliance without breaking the existing users.
 It is also recommended to use the report-only mode in production for some time to make sure the

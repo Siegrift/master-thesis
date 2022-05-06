@@ -133,7 +133,7 @@ constants via template literals without using a policy, but this is not yet supp
 \cite{tt_from_literal_method}.
 
 After the value is converted to a Trusted Types instance, the application needs to make sure the
-value is not altered before it reaches the sink and no string functions are attempted
+value is not altered before it reaches the sink and no string function calls are attempted
 (\ref{tt_integration_ensure_tt_not_altered}).
 
 \subsection{Ensuring the sink value is immutable}
@@ -164,7 +164,7 @@ long time for multiple reasons. Some of them are described in separate sections 
 \subsection{Reasoning about the integration}
 \label{sub:reason_about_integration}
 
-Proving that the integration is correct means to determining if all sinks have been located and
+Proving that the integration is correct means to determine if all sinks have been located and
 properly addressed. This is generally infeasible or impossible to prove. Projects usually look at
 patches empirically. If the integration looks correct and is properly tested then it is safe to
 assume that the integration is indeed correct. This is especially true when the integration is
